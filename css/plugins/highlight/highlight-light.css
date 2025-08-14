@@ -1,0 +1,143 @@
+.hljs-comment,
+.hljs-quote,
+.hljs-doctag,
+.hljs-keyword,
+.hljs-formula,
+.hljs-section,
+.hljs-name,
+.hljs-selector-tag,
+.hljs-deletion,
+.hljs-subst,
+.hljs-literal,
+.hljs-string,
+.hljs-regexp,
+.hljs-addition,
+.hljs-attribute,
+.hljs-meta-string,
+.hljs-built_in,
+.hljs-class .hljs-title,
+.hljs-attr,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-type,
+.hljs-selector-class,
+.hljs-selector-attr,
+.hljs-selector-pseudo,
+.hljs-number,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link,
+.hljs-meta,
+.hljs-selector-id,
+.hljs-title {
+  transition: color 0.5s ease-in-out;
+  font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
+}
+pre code {
+  width: 0px;
+  line-height: 1.5em;
+  display: block;
+  transition: background 0.5s ease-in-out, color 0.5s ease-in-out;
+  font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
+}
+[data-theme='light'] .hljs {
+  color: #24292e;
+  background: #f6f8fa;
+}
+[data-theme='light'] .hljs-doctag,
+[data-theme='light'] .hljs-keyword,
+[data-theme='light'] .hljs-meta .hljs-keyword,
+[data-theme='light'] .hljs-template-tag,
+[data-theme='light'] .hljs-template-variable,
+[data-theme='light'] .hljs-type,
+[data-theme='light'] .hljs-variable.language_ {
+  /* prettylights-syntax-keyword */
+  color: #d73a49;
+}
+[data-theme='light'] .hljs-title,
+[data-theme='light'] .hljs-title.class_,
+[data-theme='light'] .hljs-title.class_.inherited__,
+[data-theme='light'] .hljs-title.function_ {
+  /* prettylights-syntax-entity */
+  color: #6f42c1;
+}
+[data-theme='light'] .hljs-attr,
+[data-theme='light'] .hljs-attribute,
+[data-theme='light'] .hljs-literal,
+[data-theme='light'] .hljs-meta,
+[data-theme='light'] .hljs-number,
+[data-theme='light'] .hljs-operator,
+[data-theme='light'] .hljs-variable,
+[data-theme='light'] .hljs-selector-attr,
+[data-theme='light'] .hljs-selector-class,
+[data-theme='light'] .hljs-selector-id {
+  /* prettylights-syntax-constant */
+  color: #005cc5;
+}
+[data-theme='light'] .hljs-regexp,
+[data-theme='light'] .hljs-string,
+[data-theme='light'] .hljs-meta .hljs-string {
+  /* prettylights-syntax-string */
+  color: #032f62;
+}
+[data-theme='light'] .hljs-built_in,
+[data-theme='light'] .hljs-symbol {
+  /* prettylights-syntax-variable */
+  color: #e36209;
+}
+[data-theme='light'] .hljs-comment,
+[data-theme='light'] .hljs-code,
+[data-theme='light'] .hljs-formula {
+  /* prettylights-syntax-comment */
+  color: #6a737d;
+}
+[data-theme='light'] .hljs-comment,
+[data-theme='light'] .hljs-quote {
+  font-style: italic;
+}
+[data-theme='light'] .hljs-name,
+[data-theme='light'] .hljs-quote,
+[data-theme='light'] .hljs-selector-tag,
+[data-theme='light'] .hljs-selector-pseudo {
+  /* prettylights-syntax-entity-tag */
+  color: #22863a;
+}
+[data-theme='light'] .hljs-subst {
+  /* prettylights-syntax-storage-modifier-import */
+  color: #24292e;
+}
+[data-theme='light'] .hljs-section {
+  /* prettylights-syntax-markup-heading */
+  color: #005cc5;
+  font-weight: bold;
+}
+[data-theme='light'] .hljs-bullet {
+  /* prettylights-syntax-markup-list */
+  color: #735c0f;
+}
+[data-theme='light'] .hljs-emphasis {
+  /* prettylights-syntax-markup-italic */
+  color: #24292e;
+  font-style: italic;
+}
+[data-theme='light'] .hljs-strong {
+  /* prettylights-syntax-markup-bold */
+  color: #24292e;
+  font-weight: bold;
+}
+[data-theme='light'] .hljs-addition {
+  /* prettylights-syntax-markup-inserted */
+  color: #22863a;
+  background-color: #f0fff4;
+}
+[data-theme='light'] .hljs-deletion {
+  /* prettylights-syntax-markup-deleted */
+  color: #b31d28;
+  background-color: #ffeef0;
+}
+[data-theme='light'] .hljs-doctag,
+[data-theme='light'] .hljs-keyword,
+[data-theme='light'] .hljs-formula,
+[data-theme='light'] .hljs-literal {
+  font-weight: bold;
+}

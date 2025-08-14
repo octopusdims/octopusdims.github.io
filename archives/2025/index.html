@@ -8,7 +8,7 @@
 	</script>
 	<head>
 		
-<title>主页 | Hexo-Theme-Quieter</title>
+<title>归档 | Hexo-Theme-Quieter</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -52,7 +52,8 @@
 	<meta name="generator" content="Hexo 7.3.0"></head>
 
 	<body>
-		<header class="sticky-header">
+		
+    <header class="sticky-header">
 	<nav>
 		<div class="nav-left">
 			<a href="/" class="logo">
@@ -222,7 +223,7 @@
 	
 
 	<script>
-		const name = 'home';
+		const name = 'archives';
 		const ul = document.querySelectorAll('.nav-right ul')[0];
 		const lis = ul.querySelectorAll('li');
 
@@ -282,25 +283,30 @@
 	</script>
 </header>
 
+
 <div class="main-wrapper">
-	<main class="home">
-		<header class="main-header">
+    <main class="archive">
+        
+            
+            
+            
+                <header class="main-header">
 	
 		
 			
 				
+			
+				
+			
+				
+			
+				
 					<div class="header-background-content">
 						<span>
-							<img no-lazy src="/images/headers_icon/logo_white.webp" alt="Quieter">
+							<img no-lazy src="/images/headers_icon/archives.svg" alt="Quieter">
 						</span>
-						<h1>居然被你找到了这里！</h1>
+						<h1>在 2025 年里写了 1 篇文章！</h1>
 					</div>
-				
-			
-				
-			
-				
-			
 				
 			
 				
@@ -312,86 +318,50 @@
 		
 	
 </header>
-		<div class="post-card-container">
-			<div class="post-card">
-				
-					<div class="post-card-display">
-						<a class="post-card-display-item" href="/2025/08/13/hello-world/">
-							<div class="post-card-top">
-								<h1 class="post-card-top-title">Hello World</h1>
-								
-							</div>
-							<div class="img-container">
-								<img style="" src="/images/random_top_img/01.webp" alt="Cover">
-							</div>
-						</a>
-						<span class="post-card-description">
-							
-						</span>
-						<div class="post-card-meat">
-							<div class="meat-info">
-								<a class="info-category" href="/">
-									GZ-Metal-Cell
-								</a>
-								<time class="info-date">
-									<a href="/archives/2025">2025</a>/<a href="/archives/2025/08">08</a>/13
-								</time>
-							</div>
-							<img no-lazy src="/images/icon/normal.png" class="meat-type" alt="Icon">
-						</div>
-					</div>
-				
-			</div>
-		</div>
-		<div class="change-page">
-			<div class="change-page-item">
-				
-				
-				
-				
-					
-				
-					
-				
-					
-				
-					
-						
-							<div class="select-container">
-								<select aria-label="pagination_select" id="pagination_select" ></select>
-							</div>
-							<script>
-								var select = document.getElementById("pagination_select");
-								for(var i = 1; i < 1 + 1; i++)
-								{
-									var option = document.createElement("option");
-									option.value = i == 1 ? "/" : "/page/" + i.toString();
-									option.text = i;
-									select.add(option);		
-								}
-								select.selectedIndex = 1 - 1;
-								select.onchange = function() {
-									window.location.href = select.value;
-								};
-							</script>
-						
-					
-				
-					
-				
-					
-				
-					
-				
-				<!--
-					
-				-->
-				
-			</div>
-		</div>
-		
-		
+            
+        
+        <div class="article-container archive-content">
+            <article class="archive-content-info">
+                
+                <div class="grouping">
+    
+    
+    
+        
+        
+            
+            
+                <h1 id="_2025-年"><a href="#2025-年" class="headerlink" title="2025 年"></a><a href="/archives/2025">2025 年</a></h1>
+            
+        
+        
+            
+            
+                <h2 id="_2025-8-月"><a href="#2025-8 月" class="headerlink" title="8 月"></a><a href="/archives/2025/08">8 月</a></h2>
+            
+        
+        
+        <a class="grouping-item" href="/2025/08/13/hello-world/">
+            <span>Hello World</span>
+            <time>08/13</time>
+        </a>
+        
+    
+</div>
+            </article>
+            
 	<aside class="rightside">
+	
+		<div class="rightside-button not-toc-button" id="js-aside">
+			<span>
+				<img no-lazy src="/images/icon/aside.png" class="rightside-button-icon" alt="Icon">
+			</span>
+		</div>
+		<script>
+			$("#js-aside").click(function () {
+				onShowAsideButton();
+			});
+		</script>
 	
 	<div class="rightside-button" id="js-toggle_theme">
 		<span>
@@ -436,9 +406,101 @@
     
     
     
+        
+    
 </div>
-	</main>
+        </div>
+    </main>
+    
+        <aside class="main-aside">
+    
+<script src="/js/widgets/aside.js"></script>
+
+    <script>
+        showAside();
+    </script>
+
+    <div class="aside-top">
+        <div class="aside-top-about aside-card">
+            <a href="/about" class="aside-top-about-portrait">
+                <img no-lazy src="https://gz-metal-cell.github.io/about/portrait.png" alt="Q">
+            </a>
+            <div class="aside-top-about-info">
+                <span class="author"> Zi-Zi</span>
+                <span class="description">不以物喜，不以己悲。</span>
+            </div>              
+            <div class="aside-top-about-site">
+                <a href="/categories" class="aside-top-about-site-item">
+                    <span class="title">类别</span>
+                    <span class="count">0</span>
+                </a>
+                <a href="/tags" class="aside-top-about-site-item">
+                    <span class="title">标签</span>
+                    <span class="count">0</span>
+                </a>
+                <a href="/archives" class="aside-top-about-site-item">
+                    <span class="title">归档</span>
+                    <span class="count">1</span>
+                </a>
+            </div>
+            <div class="aside-top-about-contact">
+                
+                    
+                        <a href="">
+                            <img no-lazy src="/images/bottom_icon/Weibo.webp" alt="Quieter">
+                        </a>
+                    
+                        <a href="">
+                            <img no-lazy src="/images/bottom_icon/Tieba.webp" alt="Quieter">
+                        </a>
+                    
+                        <a href="">
+                            <img no-lazy src="/images/bottom_icon/Bilibili.webp" alt="Quieter">
+                        </a>
+                    
+                        <a href="">
+                            <img no-lazy src="/images/bottom_icon/github.webp" alt="Quieter">
+                        </a>
+                    
+                
+            </div>
+        </div> 
+
+        
+    </div>
+
+    <div class="aside-bottom">
+        
+            <script>
+                
+                    const tocCollapsed = true;
+                
+                
+                    const tocDepth = 6;
+                
+                var headerString = '';
+                for (let i = 1; i <= tocDepth; i++) {
+                    if (i === 1) {
+                        headerString += 'h1';
+                    } else {
+                        headerString += ', h' + i;
+                    }
+                }
+                hbeToc();
+            </script>
+            <div class="aside-bottom-toc aside-card">
+                <div class="aside-bottom-toc-title">
+                    <h1>目录</h1>
+                    <span class="toc-percentage"></span>
+                </div>
+                <ol class="aside-bottom-toc-content"></ol>
+            </div>
+        
+    </div>
+</aside>
+    
 </div>
+
 		<footer>
 	<div class="content">
 		
