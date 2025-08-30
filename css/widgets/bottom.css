@@ -1,0 +1,45 @@
+.post-bottom {
+  display: flex;
+  flex-direction: column;
+}
+.post-bottom .post-paging {
+  display: flex;
+  transition: all 0.5s ease-in-out;
+  position: relative;
+  margin: 20px 0 10px;
+}
+.post-bottom .post-paging-last,
+.post-bottom .post-paging-next {
+  display: flex;
+  flex-grow: 1;
+  flex-basis: 0;
+}
+.post-bottom .post-paging-last a,
+.post-bottom .post-paging-next a {
+  color: var(--text-secondary);
+  font-size: 16px;
+  text-decoration: none;
+  padding: 10px;
+  width: 100%;
+  border: 2px solid var(--border);
+  background: var(--background-secondary);
+  border-radius: 5px;
+  line-height: 24px;
+}
+.post-bottom .post-paging-last a:hover,
+.post-bottom .post-paging-next a:hover {
+  color: var(--text-link);
+  background: var(--background-tertiary);
+}
+.post-bottom .post-paging-last {
+  margin-right: 10px;
+}
+.post-bottom .post-paging-next {
+  margin-left: 10px;
+}
+.post-bottom .post-paging-next a {
+  text-align: right;
+}
+.post-bottom .comments {
+  margin: 20px auto;
+}

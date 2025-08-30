@@ -1,0 +1,31 @@
+body {
+  --decoration-y: 0px;
+}
+body::before,
+body::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  width: 150px;
+  height: 250px;
+  z-index: -1;
+  transform: translateY(var(--decoration-y));
+  transition: none;
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: 0.8;
+}
+body::before {
+  left: 0;
+  background-image: url(../images/decoration-left.webp);
+}
+body::after {
+  right: 0;
+  background-image: url(../images/decoration-right.webp);
+}
+@media screen and (max-width: 1200px) {
+  body::before,
+  body::after {
+    display: none;
+  }
+}
