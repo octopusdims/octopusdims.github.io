@@ -644,8 +644,8 @@ header .header-background-content span {
   align-items: center;
 }
 header .header-background-content span img {
-  width: 448px;
-  height: 448px;
+  width: 400px;
+  height: 400px;
   filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.8));
 }
 @media screen and (min-width: 960px) {
@@ -673,6 +673,15 @@ header .header-background-content span img {
     width: 2em;
     height: 2em;
   }
+  .header-background-content span {
+    height: 100px;
+  }
+  .header-background-content span img {
+    width: 96px;
+    /* Adjust this value as needed for mobile */
+    height: 96px;
+    /* Adjust this value as needed for mobile */
+  }
 }
 @media screen and (max-width: 660px) {
   header .header-background {
@@ -689,9 +698,9 @@ header .header-background-content span img {
     height: 100px;
   }
   .header-background-content span img {
-    width: 128px;
+    width: 96px;
     /* Adjust this value as needed for mobile */
-    height: 128px;
+    height: 96px;
     /* Adjust this value as needed for mobile */
   }
 }
