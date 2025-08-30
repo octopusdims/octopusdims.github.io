@@ -689,9 +689,9 @@ header .header-background-content span img {
     height: 100px;
   }
   .header-body-background-content span img {
-    width: 250px;
+    width: 128px;
     /* Adjust this value as needed for mobile */
-    height: 250px;
+    height: 128px;
     /* Adjust this value as needed for mobile */
   }
 }
