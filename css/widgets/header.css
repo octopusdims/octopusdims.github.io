@@ -235,10 +235,4 @@ header .header-background-content span img {
   .header-body-background-content span {
     height: 100px;
   }
-  .header-body-background-content span img {
-    width: 250px;
-    /* Adjust this value as needed for mobile */
-    height: 250px;
-    /* Adjust this value as needed for mobile */
-  }
 }
