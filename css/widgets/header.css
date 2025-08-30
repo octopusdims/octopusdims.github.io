@@ -228,11 +228,11 @@ header .header-background-content span img {
   header .header-background:before {
     height: 480px;
   }
-  .header-body-background-content {
+  .header-background-content {
     max-width: 90%;
     transform: translateY(-10px);
   }
-  .header-body-background-content span {
+  .header-background-content span {
     height: 100px;
   }
 }
