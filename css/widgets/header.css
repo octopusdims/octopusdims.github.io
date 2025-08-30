@@ -43,8 +43,8 @@ header nav .nav-left .logo:hover {
   border-bottom: 3px solid var(--text-link);
 }
 header nav .nav-left .logo img {
-  width: 72px;
-  height: 72px;
+  width: 48px;
+  height: 48px;
 }
 header nav .nav-left .breadcrumb {
   margin-left: 2px;
@@ -227,6 +227,12 @@ header .header-background-content span img {
   }
   header .header-background:before {
     height: 480px;
+  }
+  header nav .nav-left .logo img {
+    width: 36px;
+    /* Adjust size as needed */
+    height: 36px;
+    /* Adjust size as needed */
   }
   .header-body-background-content {
     max-width: 90%;
