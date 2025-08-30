@@ -496,8 +496,8 @@ header nav .nav-left .logo:hover {
   border-bottom: 3px solid var(--text-link);
 }
 header nav .nav-left .logo img {
-  width: 36px;
-  height: 36px;
+  width: 64px;
+  height: 64px;
 }
 header nav .nav-left .breadcrumb {
   margin-left: 2px;
@@ -627,7 +627,7 @@ header .header-background-content {
   max-width: 80%;
 }
 header .header-background-content h1 {
-  margin: 12px 0 28px;
+  margin: 96px 0 28px;
   font-weight: 500;
   font-size: 20px;
   line-height: 1.6;
@@ -644,8 +644,8 @@ header .header-background-content span {
   align-items: center;
 }
 header .header-background-content span img {
-  width: 56px;
-  height: 56px;
+  width: 448px;
+  height: 448px;
   filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.8));
 }
 @media screen and (min-width: 960px) {
