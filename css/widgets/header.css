@@ -228,17 +228,17 @@ header .header-background-content span img {
   header .header-background:before {
     height: 480px;
   }
-  header nav .nav-left .logo img {
-    width: 324px;
-    /* Adjust size as needed */
-    height: 324px;
-    /* Adjust size as needed */
-  }
   .header-body-background-content {
     max-width: 90%;
     transform: translateY(-10px);
   }
   .header-body-background-content span {
     height: 100px;
+  }
+  .header-body-background-content span img {
+    width: 250px;
+    /* Adjust this value as needed for mobile */
+    height: 250px;
+    /* Adjust this value as needed for mobile */
   }
 }
