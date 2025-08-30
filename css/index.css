@@ -644,8 +644,8 @@ header .header-background-content span {
   align-items: center;
 }
 header .header-background-content span img {
-  width: 400px;
-  height: 400px;
+  width: 388px;
+  height: 388px;
   filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.8));
 }
 @media screen and (min-width: 960px) {
