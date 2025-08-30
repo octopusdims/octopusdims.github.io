@@ -43,8 +43,8 @@ header nav .nav-left .logo:hover {
   border-bottom: 3px solid var(--text-link);
 }
 header nav .nav-left .logo img {
-  width: 48px;
-  height: 48px;
+  width: 64px;
+  height: 64px;
 }
 header nav .nav-left .breadcrumb {
   margin-left: 2px;
