@@ -220,6 +220,15 @@ header .header-background-content span img {
     width: 2em;
     height: 2em;
   }
+  .header-background-content span {
+    height: 100px;
+  }
+  .header-background-content span img {
+    width: 96px;
+    /* Adjust this value as needed for mobile */
+    height: 96px;
+    /* Adjust this value as needed for mobile */
+  }
 }
 @media screen and (max-width: 660px) {
   header .header-background {
