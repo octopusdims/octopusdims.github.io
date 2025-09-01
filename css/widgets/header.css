@@ -195,11 +195,6 @@ header .header-background-content span img {
   height: 366px;
   filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.8));
 }
-@media screen and (min-width: 960px) {
-  header nav .nav-right-close {
-    display: none;
-  }
-}
 @media screen and (max-width: 960px) {
   header nav .nav-left {
     flex-grow: 10;
