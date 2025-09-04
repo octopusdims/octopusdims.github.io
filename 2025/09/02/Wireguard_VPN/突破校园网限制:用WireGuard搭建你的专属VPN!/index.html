@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang=zh-CN data-theme="light">
+	
+<script src="/js/plugins/toggleTheme.js"></script>
+
+	<script>
+		setTheme();
+	</script>
+	<head>
+		
+<title>突破校园网限制：用 WireGuard 搭建你的专属 VPN！ | DIMS</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="shortcut icon" type="image/x-icon" href="/images/icon/favicon.ico">
+<link href="/css/plugins/print.css" media="print" rel="stylesheet" />
+
+<link rel="stylesheet" href="/css/index.css">
+
+
+
+<meta name="keywords" content="校园网,服务器,">
+<meta name="description" content="">
+
+
+
+<script src="/js/plugins/jquery.min.js"></script>
+
+
+<script src="/js/plugins/hljs.min.js"></script>
+
+
+<script src="/js/plugins/init.js"></script>
+
+
+<script src="/js/plugins/hide.js"></script>
+
+
+<script src="/js/plugins/tabs.js"></script>
+
+
+
+    
+
+
+
+
+
+
+
+    
+
+	<meta name="generator" content="Hexo 7.3.0"></head>
+
+	<body>
+		<header class="sticky-header">
+	<nav>
+		<div class="nav-left">
+			<a href="/" class="logo">
+				<img no-lazy src="/images/headers_icon/logo.webp" alt="Quieter">
+			</a>
+			<ul class="breadcrumb" id="breadcrumb"></ul>
+		</div>
+		<div class="nav-right">
+			<ul>
+				
+					<li>
+						<a href="/">
+						  主页
+						</a>
+					</li>
+				
+					<li>
+						<a href="/categories">
+						  类别
+						</a>
+					</li>
+				
+					<li>
+						<a href="/tags">
+						  标签
+						</a>
+					</li>
+				
+					<li>
+						<a href="/archives">
+						  归档
+						</a>
+					</li>
+				
+					<li>
+						<a href="/galleries">
+						  相册
+						</a>
+					</li>
+				
+					<li>
+						<a href="/links">
+						  链接
+						</a>
+					</li>
+				
+					<li>
+						<a href="/about">
+						  关于
+						</a>
+					</li>
+								  
+			</ul>
+		</div>
+		<div class="nav-right-close">
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+				<path fill="none" d="M0 0h24v24H0z" />
+				<path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z" fill="rgba(68,68,68,1)" />
+			</svg>
+		</div>
+
+		<div class="sidebar">
+    <div class="topo">
+        <p>DIMS</p>
+    </div>
+    <ul>
+        
+        <li>
+            <a href="/">
+                主页
+            </a>
+        </li>
+        
+        <li>
+            <a href="/categories">
+                类别
+            </a>
+        </li>
+        
+        <li>
+            <a href="/tags">
+                标签
+            </a>
+        </li>
+        
+        <li>
+            <a href="/archives">
+                归档
+            </a>
+        </li>
+        
+        <li>
+            <a href="/galleries">
+                相册
+            </a>
+        </li>
+        
+        <li>
+            <a href="/links">
+                链接
+            </a>
+        </li>
+        
+        <li>
+            <a href="/about">
+                关于
+            </a>
+        </li>
+        
+    </ul>
+    <div class="sidebar-footer">
+        
+        <a target="_blank" rel="noopener" href="https://github.com/octopusdims">
+            <img no-lazy src="/images/bottom_icon/github.webp" alt="Quieter">
+        </a>
+        
+    </div>
+</div>
+<div class='shelter'>
+    <script>
+        $(function() {
+            $('.nav-right-close > svg').click(function() {
+                $('.sidebar').animate({
+                    right: "0"
+                }, 500);
+                $('.shelter').fadeIn("slow");
+            
+                var element = $('.topo');
+                element.addClass('custom-style');
+            
+                var links = null;
+                if ("") {
+                    links = "".split(',');
+                } else {
+                    links = "/images/random_top_img/01.webp,/images/random_top_img/02.webp".split(',');
+                }
+            
+                var randomLink = links[Math.floor(Math.random() * links.length)];
+                element.css('background-image', "url('" + randomLink + "')");
+            });
+          
+            $('.shelter').click(function(e) {
+                $('.sidebar').animate({
+                    right: "-100%"
+                }, 500);
+                $('.shelter').fadeOut("slow");
+            });
+        });      
+    </script>
+</div>
+	</nav>
+
+	
+		<div class="header-background"></div>
+	
+
+	<script>
+		const name = 'post';
+		const ul = document.querySelectorAll('.nav-right ul')[0];
+		const lis = ul.querySelectorAll('li');
+
+		if (name == 'home') {
+			lis[0].classList.add('select');
+		} else {
+			for (let i = 0; i < lis.length; i++) {
+				const li = lis[i];
+				const a = li.querySelector('a');
+				if (name === a.href.split('/')[3]) {
+					li.classList.add('select');
+				}
+			}
+		}
+	</script>
+	
+	<script>
+		var element = document.querySelector('.header-background');
+		if(element) {
+			element.classList.add('custom-style');
+			var links = null;
+			if("")
+			{
+				links = "".split(',');
+			} else
+			{
+				links = "/images/random_top_img/01.webp,/images/random_top_img/02.webp".split(',');
+			}
+			var randomLink = links[Math.floor(Math.random() * links.length)];
+			element.style.backgroundImage = "url('" + randomLink + "')";
+		}
+	</script>
+
+	
+<script src="/js/plugins/breadcrumb.js"></script>
+
+	<script>
+		var menus_title = [];
+		
+			menus_title.push({home: '主页'});
+		
+			menus_title.push({categories: '类别'});
+		
+			menus_title.push({tags: '标签'});
+		
+			menus_title.push({archives: '归档'});
+		
+			menus_title.push({galleries: '相册'});
+		
+			menus_title.push({links: '链接'});
+		
+			menus_title.push({about: '关于'});
+		
+		
+			
+				postsBreadcrumb(
+					document.getElementById('breadcrumb'),
+					"类别",
+					"/categories",
+					"小技巧！",
+					"/categories/小技巧！"
+				);
+			
+		
+	</script>
+</header>
+
+<div class="main-wrapper">
+    <main class="post">
+        <header class="main-header">
+	
+		
+			
+				
+<link rel="stylesheet" href="/css/plugins/fancybox.css">
+
+				
+<script src="/js/plugins/fancybox.umd.js"></script>
+
+				
+<script src="/js/plugins/fancybox.js"></script>
+
+			
+			<div class="post-header-background-content">
+				<ul class="post-header-tag">
+					
+						
+							<li><a href="/tags/校园网"><span>校园网</span></a></li>
+						
+							<li><a href="/tags/服务器"><span>服务器</span></a></li>
+						
+					
+				</ul>
+				
+				<h1>突破校园网限制：用 WireGuard 搭建你的专属 VPN！</h1>
+		
+				
+		
+				<div class="post-header-info">
+					<svg t="1604839279282" class="icon" viewBox="0 0 1024 1024" version="1.1"
+					xmlns="http://www.w3.org/2000/svg" p-id="2901" width="20" height="20">
+						<path
+							d="M513 956.3c-247.7 0-448-200.3-448-448S265.3 66.2 513 66.2s448 200.3 448 448-200.3 442.1-448 442.1z m0-830.9c-212.2 0-388.8 170.7-388.8 388.8C124.2 726.3 294.9 903 513 903c212.2 0 388.8-170.7 388.8-388.8S725.2 125.4 513 125.4z m0 430.2c-94.2 0-170.7-76.5-170.7-170.7S418.8 207.8 513 207.8s170.7 76.5 170.7 170.7S607.2 555.6 513 555.6z m0-289.1c-64.6 0-112 52.8-112 112s47.4 117.9 112 117.9 112-52.8 112-112-47.4-117.9-112-117.9z m0 689.8c-135.7 0-259-58.7-341.9-158.9l-11.8-17.8 11.8-17.8c76.5-117.9 206.2-188.5 347.8-188.5 135.7 0 265 64.6 341.9 182.6l11.8 17.8-11.8 17.8C778 897.1 648.7 956.3 513 956.3zM230.3 773.2C300.9 849.7 406.9 897 513 897c112 0 218.1-47.4 288.6-129.8-70.5-88.2-170.7-135.6-282.7-135.6s-218.1 53.3-288.6 141.6z"
+							p-id="2902" fill="#ffffff"></path>
+					</svg>
+					<div class="post-header-info-author">
+						<a href="/about">OCTOPUS</a>
+					</div>
+					
+						<div class="post-header-info-categories">
+							
+								<a href="/categories/小技巧！">小技巧！</a>
+							
+						</div>
+					
+					<time>2025/09/02 21:37:12</time>
+				</div>
+		
+				
+					<div class="post-header-stat">
+						<svg version="1.0" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+						viewBox="0 0 200 200" enable-background="new 0 0 200 200" xml:space="preserve" width="20" height="20">
+							<path fill="#FFFFFF" d="M187.2,165.6c0,2.6-2.1,4.7-4.7,4.7H17.5c-2.6,0-4.7-2.1-4.7-4.7s2.1-4.7,4.7-4.7h165.1
+								C185.2,160.9,187.2,163,187.2,165.6z"/>
+							<path fill="#FFFFFF" d="M17.5,29.7c2.6,0,4.7,2.1,4.7,4.7v131.2c0,2.6-2.1,4.7-4.7,4.7s-4.7-2.1-4.7-4.7V34.4
+								C12.8,31.8,14.9,29.7,17.5,29.7z M77.9,91.5c1.8,1.8,1.8,4.8,0,6.6l-39.8,39.8c-1.9,1.8-4.9,1.7-6.6-0.2c-1.7-1.8-1.7-4.6,0-6.4
+								l39.8-39.8C73.1,89.6,76,89.6,77.9,91.5z M169.9,70.2c1.6,2.1,1.1,5-0.9,6.5c0,0,0,0,0,0l-64.2,48.2c-2.1,1.5-5,1.1-6.6-0.9
+								c-1.6-2.1-1.1-5,0.9-6.5c0,0,0,0,0,0l64.2-48.2C165.4,67.7,168.3,68.1,169.9,70.2L169.9,70.2z"/>
+							<path fill="#FFFFFF" d="M104.6,124.5c-1.8,1.8-4.8,1.8-6.6,0L71.6,98.1c-1.8-1.8-1.8-4.8,0-6.6c1.8-1.8,4.8-1.8,6.6,0l26.3,26.3
+								C106.4,119.6,106.4,122.6,104.6,124.5C104.6,124.4,104.6,124.4,104.6,124.5z"/>
+						</svg>
+		
+						
+							
+<script src="/js/plugins/wordCount.js"></script>
+
+							<p class="post-count">文字数：---</p>
+						
+		
+						
+							<p id="busuanzi_container_page_pv" style='display:none;'>阅读数：<span id="busuanzi_value_page_pv"></span></p>
+						
+					</div>
+				
+			</div>
+		
+	
+</header>
+        <div class="post-content article-container">
+            <article class="post-content-info">
+                <h1 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract:"></a>Abstract:</h1><p>你是否也遇到过这样的窘境：在宿舍里，和同学的设备明明连接着同一个 Wi-Fi，却仿佛身处两个世界，无法互相访问？无论是想和小伙伴联机打一把游戏，或是方便地共享文件，甚至是远程访问自己搭建在宿舍的树莓派，都会因为设备间无法 <code>ping</code> 通而宣告失败。这背后的“罪魁祸首”，便是校园网为了网络安全和管理而普遍启用的 AP 隔离（AP Isolation）技术。</p>
+<p>别担心！本文将手把手带你利用一台云服务器和现代、轻量、高效的 WireGuard 工具，轻松搭建一个属于你自己的虚拟局域网（VPN），彻底突破校园网的限制，让你名下的所有设备都能自由地“握手”和通信。</p>
+<h1 id="准备工作："><a href="#准备工作：" class="headerlink" title="准备工作："></a>准备工作：</h1><ol>
+<li><strong>一台云服务器</strong>：主流的云服务商均可（如阿里云、腾讯云、AWS、Vultr等），许多厂商还为学生提供专属优惠。为了获得最佳体验，建议选择地理位置靠近你学校的机房，以确保更低的延迟。<ul>
+<li><strong>操作系统</strong>：推荐选择 <strong>Ubuntu 20.04 LTS</strong> 或 <strong>22.04 LTS</strong>，这两个版本对 WireGuard 的支持更为原生和稳定。</li>
+<li><strong>重要提醒</strong>：请务必确保云服务器的<strong>安全组（或防火墙）</strong> 规则已经放行了 WireGuard 计划使用的端口。本文后续教程将使用默认的 <code>UDP 51820</code> 端口。<strong>这是新手最容易踩的坑，没有之一！</strong></li>
+</ul>
+</li>
+<li><strong>客户端设备</strong>：你需要在所有希望加入这个虚拟局域网的设备上安装 WireGuard 客户端。它几乎支持所有平台（Windows, macOS, Linux, Android, iOS）。</li>
+</ol>
+<h1 id="详细步骤"><a href="#详细步骤" class="headerlink" title="详细步骤"></a>详细步骤</h1><h4 id="第一部分：在云服务器上安装和配置WireGuard"><a href="#第一部分：在云服务器上安装和配置WireGuard" class="headerlink" title="第一部分：在云服务器上安装和配置WireGuard"></a>第一部分：在云服务器上安装和配置WireGuard</h4><p><strong>步骤 1: 通过SSH连接到你的云服务器</strong></p>
+<p>打开你的终端或SSH工具，连接到服务器。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash">ssh root@your_server_ip<br></code></pre></td></tr></table></figure>
+<p><strong>步骤 2: 安装WireGuard及相关工具</strong></p>
+<p>WireGuard早已被集成到较新的Linux内核中，安装过程非常简单。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># Ubuntu/Debian 系统</span><br><span class="hljs-built_in">sudo</span> apt update<br><span class="hljs-built_in">sudo</span> apt install wireguard resolvconf -y<br></code></pre></td></tr></table></figure>
+<p>(<code>resolvconf</code> 包用于辅助管理DNS，建议一并安装。)</p>
+<p><strong>步骤 3: 生成服务器端的密钥对</strong></p>
+<p>WireGuard 的安全基石是公钥/私钥加密体系。我们需要为服务器生成一对密钥。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 设置一个安全的权限掩码，确保密钥文件不被其他用户读取</span><br><span class="hljs-built_in">umask</span> 077<br><br><span class="hljs-comment"># 生成服务器私钥并保存</span><br>wg genkey &gt; /etc/wireguard/privatekey<br><br><span class="hljs-comment"># 基于私钥生成对应的公钥</span><br>wg pubkey &lt; /etc/wireguard/privatekey &gt; /etc/wireguard/publickey<br></code></pre></td></tr></table></figure>
+<p><strong>步骤 4: 创建服务器配置文件</strong></p>
+<p>这是整个设置过程的核心。创建并编辑 WireGuard 的主配置文件：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash">vim /etc/wireguard/wg0.conf<br></code></pre></td></tr></table></figure>
+<p>将以下内容填入文件中。<strong>请务必仔细阅读注释，并将占位符替换为你的实际信息</strong>：</p>
+<figure class="highlight ini"><table><tr><td class="code"><pre><code class="hljs ini"><span class="hljs-section">[Interface]</span><br><span class="hljs-comment"># --- 服务器自身配置段 ---</span><br><span class="hljs-comment"># Address 定义了VPN网络的网段和服务器在此网络中的IP地址。</span><br><span class="hljs-comment"># 10.0.0.1/24 表示网段是 10.0.0.0，子网掩码是 255.255.255.0，服务器IP是 10.0.0.1。</span><br><span class="hljs-comment"># 这个网段最多可容纳254个设备。</span><br><span class="hljs-attr">Address</span> = <span class="hljs-number">10.0</span>.<span class="hljs-number">0.1</span>/<span class="hljs-number">24</span><br><span class="hljs-attr">SaveConfig</span> = <span class="hljs-literal">true</span><br><span class="hljs-comment"># ListenPort 是WireGuard监听的UDP端口，必须与你在云服务器防火墙中开放的端口一致。</span><br><span class="hljs-attr">ListenPort</span> = <span class="hljs-number">51820</span><br><span class="hljs-comment"># PrivateKey 就是刚才生成的服务器私钥，将 /etc/wireguard/privatekey 文件中的那串神秘代码粘贴到这里。</span><br><span class="hljs-attr">PrivateKey</span> = &lt;SERVER_PRIVATE_KEY&gt;<br><span class="hljs-comment"># PostUp/PostDown 这两行是魔法所在！</span><br><span class="hljs-comment"># 它们利用 iptables 设置了网络地址转换(NAT)和IP转发规则。</span><br><span class="hljs-comment"># 这使得连接到VPN的客户端不仅可以互相通信，还能通过服务器作为跳板访问互联网。</span><br><span class="hljs-comment"># 请注意，`eth0` 是服务器默认的公网网卡名称。如果你的服务器网卡名是 `ens3` 或其他（可通过 `ip a` 命令查看），请务必替换它。</span><br><span class="hljs-attr">PostUp</span> = iptables -A FORWARD -i %i -j ACCEPT<span class="hljs-comment">; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE</span><br><span class="hljs-attr">PostDown</span> = iptables -D FORWARD -i %i -j ACCEPT<span class="hljs-comment">; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE</span><br></code></pre></td></tr></table></figure>
+<p><strong>步骤 5: 开启内核的IP转发功能</strong></p>
+<p>为了让服务器能够扮演“路由器”的角色，在不同网络间转发数据包，我们需要开启系统的IP转发功能。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 将配置写入系统文件，使其永久生效</span><br><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;net.ipv4.ip_forward=1&quot;</span> &gt;&gt; /etc/sysctl.conf<br><br><span class="hljs-comment"># 立即应用该配置</span><br>sysctl -p<br></code></pre></td></tr></table></figure>
+<p><strong>步骤 6: 启动WireGuard服务并设置开机自启</strong></p>
+<p>现在，让我们唤醒WireGuard服务。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 启动名为 wg0 的WireGuard接口（对应wg0.conf文件）</span><br>wg-quick up wg0<br><br><span class="hljs-comment"># 将其设置为开机自动启动，省去每次重启服务器后手动开启的麻烦</span><br>systemctl <span class="hljs-built_in">enable</span> wg-quick@wg0<br><br><span class="hljs-comment"># 检查一下运行状态</span><br>wg show<br></code></pre></td></tr></table></figure>
+<p>如果 <code>wg show</code> 命令成功输出了接口信息和监听端口，没有任何报错，那么恭喜你，服务端已经成功运行起来了！</p>
+<hr>
+<h4 id="第二部分：配置客户端设备"><a href="#第二部分：配置客户端设备" class="headerlink" title="第二部分：配置客户端设备"></a>第二部分：配置客户端设备</h4><p><strong>步骤 1: 为每个客户端生成自己的密钥对</strong><br><div class="tabs" id="0"><div class="nav-tabs"><button type="button" class="tab active" data-href="0-1">方法A:在客户端软件上生成</button><button type="button" class="tab" data-href="0-2">方法B:(服务器上生成)</button></div><div class="tab-contents"><div class="tab-item-content active" id="0-1"><p><strong>在Windows/macOS/Android/iOS的WireGuard官方客户端中，当你点击“添加一个空隧道”时，软件会自动为你生成一对全新的公私钥。</strong> 这种方法最简单安全，因为私钥从未离开过你的设备。<br><img src="/2025/09/02/Wireguard_VPN/%E7%AA%81%E7%A0%B4%E6%A0%A1%E5%9B%AD%E7%BD%91%E9%99%90%E5%88%B6:%E7%94%A8WireGuard%E6%90%AD%E5%BB%BA%E4%BD%A0%E7%9A%84%E4%B8%93%E5%B1%9EVPN!/01.png" alt="以ios端为例"></p></div><div class="tab-item-content" id="0-2"><p><strong>你也可以在服务器上为每个客户端生成密钥对（操作与生成服务器密钥类似），但这需要你将生成的私钥安全地分发到对应的客户端设备上。</strong></p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 为客户端1生成私钥</span><br><span class="hljs-built_in">umask</span> 077<br>wg genkey &gt; /etc/wireguard/client1_privatekey<br><br><span class="hljs-comment"># 为客户端1生成公钥</span><br>wg pubkey &lt; /etc/wireguard/client1_privatekey &gt; /etc/wireguard/client1_publickey<br></code></pre></td></tr></table></figure></div></div></div></p>
+<p><strong>现在，我们来规划一下虚拟局域网的IP地址。假设你有两台设备需要互联：一台PC和一台笔记本电脑（Laptop）。</strong></p>
+<ul>
+<li><strong>PC</strong>:<ul>
+<li>公钥: <code>PC_PUBLIC_KEY</code></li>
+<li>私钥: <code>PC_PRIVATE_KEY</code> (由PC上的客户端生成或从服务器分发)</li>
+<li>分配的VPN IP: <code>10.0.0.2/32</code></li>
+</ul>
+</li>
+<li><strong>Laptop</strong>:<ul>
+<li>公钥: <code>LAPTOP_PUBLIC_KEY</code></li>
+<li>私钥: <code>LAPTOP_PRIVATE_KEY</code></li>
+<li>分配的VPN IP: <code>10.0.0.3/32</code></li>
+</ul>
+</li>
+</ul>
+<p><strong>步骤 2: 将客户端信息“注册”到服务器上</strong></p>
+<p>回到你的云服务器，再次编辑WireGuard的配置文件，告诉服务器有哪些合法的“小伙伴”可以连接进来。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash">vim /etc/wireguard/wg0.conf<br></code></pre></td></tr></table></figure>
+<p>在文件末尾，为每一个客户端设备添加一个 <code>[Peer]</code> 配置块。</p>
+<figure class="highlight ini"><table><tr><td class="code"><pre><code class="hljs ini"><span class="hljs-comment"># ... [Interface] 部分保持不变 ...</span><br><br><span class="hljs-section">[Peer]</span><br><span class="hljs-comment"># 这是你的PC的配置</span><br><span class="hljs-attr">PublicKey</span> = PC_PUBLIC_KEY <span class="hljs-comment"># 替换为你的PC客户端的公钥</span><br><span class="hljs-attr">AllowedIPs</span> = <span class="hljs-number">10.0</span>.<span class="hljs-number">0.2</span>/<span class="hljs-number">32</span> <span class="hljs-comment"># 在VPN网络中，只允许这个公钥使用 10.0.0.2 这个IP地址</span><br><br><span class="hljs-section">[Peer]</span><br><span class="hljs-comment"># 这是你的Laptop的配置</span><br><span class="hljs-attr">PublicKey</span> = LAPTOP_PUBLIC_KEY <span class="hljs-comment"># 替换为你的Laptop客户端的公钥</span><br><span class="hljs-attr">AllowedIPs</span> = <span class="hljs-number">10.0</span>.<span class="hljs-number">0.3</span>/<span class="hljs-number">32</span> <span class="hljs-comment"># 为Laptop分配 10.0.0.3 这个IP地址</span><br></code></pre></td></tr></table></figure>
+<blockquote>
+<p>每增加一个新设备，就需要在这里为其添加一个新的 <code>[Peer]</code> 配置块。</p>
+</blockquote>
+<p>保存退出后，必须重启WireGuard服务来加载新的配置：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 先关闭</span><br>wg-quick down wg0<br><span class="hljs-comment"># 再启动</span><br>wg-quick up wg0<br></code></pre></td></tr></table></figure>
+<p><strong>步骤 3: 为客户端创建各自的配置文件</strong></p>
+<p>现在，在你的本地电脑上为每个客户端创建一个 <code>.conf</code> 配置文件。以PC为例，内容应如下：</p>
+<figure class="highlight ini"><table><tr><td class="code"><pre><code class="hljs ini"><span class="hljs-section">[Interface]</span><br><span class="hljs-comment"># --- PC客户端配置 ---</span><br><span class="hljs-attr">PrivateKey</span> = PC_PRIVATE_KEY <span class="hljs-comment"># 填入PC客户端自己的私钥</span><br><span class="hljs-attr">Address</span> = <span class="hljs-number">10.0</span>.<span class="hljs-number">0.2</span>/<span class="hljs-number">24</span> <span class="hljs-comment"># 必须和服务器上为它分配的AllowedIPs地址一致。/24的子网掩码是为了让PC知道整个10.0.0.0网段都属于VPN网络</span><br><span class="hljs-attr">DNS</span> = <span class="hljs-number">8.8</span>.<span class="hljs-number">8.8</span>, <span class="hljs-number">1.1</span>.<span class="hljs-number">1.1</span> <span class="hljs-comment"># 可选，但推荐设置一个公共DNS服务器</span><br><br><span class="hljs-section">[Peer]</span><br><span class="hljs-comment"># --- 服务器端点配置 ---</span><br><span class="hljs-attr">PublicKey</span> = SERVER_PUBLIC_KEY <span class="hljs-comment"># 填入服务器的公钥（/etc/wireguard/publickey文件内容）</span><br><span class="hljs-attr">Endpoint</span> = your_server_ip:<span class="hljs-number">51820</span> <span class="hljs-comment"># 指向你的云服务器的公网IP地址和监听端口</span><br><span class="hljs-comment"># AllowedIPs 决定了哪些流量会通过VPN隧道。</span><br><span class="hljs-comment"># 10.0.0.0/24: 表示只有目标地址是10.0.0.0/24网段（即其他VPN客户端）的流量，才会通过VPN。访问百度等网站的流量不受影响。</span><br><span class="hljs-comment"># 0.0.0.0/0, ::/0: 表示所有IPv4和IPv6流量（即全局流量）都将通过VPN。这会隐藏你的真实IP，但也会消耗更多服务器流量。</span><br><span class="hljs-attr">AllowedIPs</span> = <span class="hljs-number">10.0</span>.<span class="hljs-number">0.0</span>/<span class="hljs-number">24</span><br><span class="hljs-comment"># PersistentKeepalive 对于处于NAT网络（如校园网）后的客户端至关重要。</span><br><span class="hljs-comment"># 它会每隔25秒发送一个“心跳包”，防止连接因长时间无通信而被中断。</span><br><span class="hljs-attr">PersistentKeepalive</span> = <span class="hljs-number">25</span><br></code></pre></td></tr></table></figure>
+<ul>
+<li><strong>小技巧：为手机生成配置二维码</strong>：对于手机客户端，手动输入配置很麻烦。你可以在服务器上将客户端的配置文件内容生成一个二维码，用手机App一扫即可导入。<ul>
+<li>先安装二维码生成工具：<code>sudo apt install qrencode</code></li>
+<li>然后生成二维码：<code>qrencode -t ansiutf8 &lt; /path/to/your/client.conf</code> (将路径替换为你的客户端配置文件路径)</li>
+</ul>
+</li>
+</ul>
+<p><strong>步骤 4: 在客户端设备上导入配置并激活</strong></p>
+<ul>
+<li><strong>Windows/macOS</strong>：打开WireGuard客户端，点击“从文件导入隧道…”，选择你刚刚创建的 <code>.conf</code> 文件。</li>
+<li><strong>Android/iOS</strong>：打开App，点击右下角的“+”号，可以选择“从文件或存档导入”或“扫描二维码”。</li>
+</ul>
+<p>导入成功后，在隧道列表中找到你新建的连接，点击开关按钮以“激活”。</p>
+<hr>
+<h4 id="第三部分：测试与使用"><a href="#第三部分：测试与使用" class="headerlink" title="第三部分：测试与使用"></a>第三部分：测试与使用</h4><p>万事俱备，只欠东风。现在我们来验证一下劳动成果。</p>
+<ol>
+<li><strong>检查服务器连接状态</strong>：在所有客户端都激活连接后，回到服务器的SSH窗口，再次运行 <code>wg show</code> 命令。此时，你应该能看到所有已配置的 <code>[Peer]</code> 信息，并且它们的 <code>latest handshake</code>（最近一次握手）时间应该在几分钟之内，同时 <code>transfer</code> 项应该有数据收发记录。</li>
+<li><strong>测试客户端之间的连通性</strong>：<ul>
+<li>在你的PC（VPN IP为 <code>10.0.0.2</code>）上，打开命令提示符（CMD）或 PowerShell，尝试 <code>ping</code> 你的Laptop的VPN IP：<figure class="highlight plaintext"><table><tr><td class="code"><pre><code class="hljs plaintext">ping 10.0.0.3<br></code></pre></td></tr></table></figure></li>
+<li>反过来，在Laptop上 <code>ping</code> 你的PC：<figure class="highlight plaintext"><table><tr><td class="code"><pre><code class="hljs plaintext">ping 10.0.0.2<br></code></pre></td></tr></table></figure></li>
+<li>如果双方都能收到来自对方的回复，那么恭喜你，你的专属虚拟局域网已经成功搭建！现在，无论是联机游戏、访问NAS还是远程调试，都畅通无阻了。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="常见问题与排查-Troubleshooting"><a href="#常见问题与排查-Troubleshooting" class="headerlink" title="常见问题与排查 (Troubleshooting)"></a>常见问题与排查 (Troubleshooting)</h3><ol>
+<li><p><strong>客户端无法连接，或连接后没有数据传输（<code>transfer</code> 为0）</strong></p>
+<ul>
+<li><strong>99% 的问题都出在这里：云服务器的防火墙/安全组！</strong> 立刻、马上、现在就去你的云服务商控制台检查，确保你已经为服务器的公网IP添加入站规则，允许 <strong>UDP</strong> 协议的 <strong>51820</strong> 端口的流量通过。</li>
+</ul>
+</li>
+<li><p><strong>客户端之间无法 <code>ping</code> 通，但都能 <code>ping</code> 通服务器（<code>10.0.0.1</code>）</strong></p>
+<ul>
+<li><strong>检查IP转发</strong>：在服务器上运行 <code>cat /proc/sys/net/ipv4/ip_forward</code>，确保结果是 <code>1</code>。如果不是，请重新执行上面的第五步。</li>
+<li><strong>检查iptables规则</strong>：确认 <code>/etc/wireguard/wg0.conf</code> 文件中的 <code>PostUp</code> 和 <code>PostDown</code> 命令没有写错，特别是公网网卡名称（<code>eth0</code> 或 <code>ens3</code> 等）是否正确。</li>
+<li><strong>检查客户端配置</strong>：确保所有客户端的 <code>[Interface]</code> 部分的 <code>Address</code> 子网掩码都是 <code>/24</code>，而 <code>[Peer]</code> 部分服务器的 <code>AllowedIPs</code> 是 <code>10.0.0.0/24</code>。</li>
+</ul>
+</li>
+<li><p><strong>连接不稳定，时断时续</strong></p>
+<ul>
+<li>这很可能是NAT设备超时导致的。请确保你的客户端配置文件中包含了 <code>PersistentKeepalive = 25</code> 这一行，它能有效维持连接的活性。</li>
+</ul>
+</li>
+<li><p><strong>连接速度慢</strong></p>
+<ul>
+<li>这主要取决于你的云服务器的带宽和地理位置。选择按量付费模式的服务器通常能获得更高的瞬时带宽。如果速度不理想，可以尝试更换到离你更近的机房或换一家云服务商。</li>
+</ul>
+</li>
+</ol>
+
+            </article>
+            
+	<aside class="rightside">
+	
+		<div class="rightside-button not-toc-button" id="js-aside">
+			<span>
+				<img no-lazy src="/images/icon/aside.png" class="rightside-button-icon" alt="Icon">
+			</span>
+		</div>
+		<script>
+			$("#js-aside").click(function () {
+				onShowAsideButton();
+			});
+		</script>
+	
+	<div class="rightside-button" id="js-toggle_theme">
+		<span>
+			<img no-lazy src="/images/icon/toggle_theme.png" class="rightside-button-icon" alt="Icon">
+		</span>
+	</div>
+
+	
+<script src="/js/plugins/goto_position.js"></script>
+
+	
+	<div class="rightside-button" id="js-go_top">
+		<span>
+			<img no-lazy src="/images/icon/go_top.png" class="rightside-button-icon" alt="Icon">
+		</span>
+	</div>
+	<div class="rightside-button" id="js-go_bottom">
+		<span>
+			<img no-lazy src="/images/icon/go_bottom.png" class="rightside-button-icon" alt="Icon">
+		</span>
+	</div>
+
+	<script>
+		setToggleThemeButtonListener();
+	</script>
+	<script>
+		$('#js-go_top')
+		.gotoPosition( {
+			speed: 300,
+			target: 'top',
+		} );
+		$('#js-go_bottom')
+		.gotoPosition( {
+			speed: 300,
+			target: 'bottom',
+		} );
+	</script>
+</aside>
+
+
+<div class="post-bottom">
+    
+    
+    
+        
+    
+</div>
+        </div>
+    </main>
+    
+        <aside class="main-aside">
+    
+<script src="/js/widgets/aside.js"></script>
+
+    <script>
+        showAside();
+    </script>
+
+    <div class="aside-top">
+        <div class="aside-top-about aside-card">
+            <a href="/about" class="aside-top-about-portrait">
+                <img no-lazy src="https://avatars.githubusercontent.com/u/204014295?v=4" alt="Q">
+            </a>
+            <div class="aside-top-about-info">
+                <span class="author"> OCTOPUS</span>
+                <span class="description">Testing.</span>
+            </div>              
+            <div class="aside-top-about-site">
+                <a href="/categories" class="aside-top-about-site-item">
+                    <span class="title">类别</span>
+                    <span class="count">1</span>
+                </a>
+                <a href="/tags" class="aside-top-about-site-item">
+                    <span class="title">标签</span>
+                    <span class="count">2</span>
+                </a>
+                <a href="/archives" class="aside-top-about-site-item">
+                    <span class="title">归档</span>
+                    <span class="count">1</span>
+                </a>
+            </div>
+            <div class="aside-top-about-contact">
+                
+                    
+                        <a target="_blank" rel="noopener" href="https://github.com/octopusdims">
+                            <img no-lazy src="/images/bottom_icon/github.webp" alt="Quieter">
+                        </a>
+                    
+                
+            </div>
+        </div> 
+
+        
+    </div>
+
+    <div class="aside-bottom">
+        
+    </div>
+</aside>
+    
+</div>
+		<footer>
+	<div class="content">
+		
+			<span>©2025&nbsp;By&nbsp;<a href="/about">OCTOPUS</a>.</span>
+		
+		<span><a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> theme by <a target="_blank" rel="noopener" href="https://github.com/GZ-Metal-Cell/hexo-theme-quieter">Quieter</a>.</span>
+		
+	</div>
+
+	
+<script src="/js/plugins/ref.js"></script>
+
+	
+<script src="/js/plugins/highlight_tools.js"></script>
+
+	<script>
+		var copyIcon = "/images/icon/copy.png";
+		var closeCodeBlockIcon = "/images/icon/close_code_block.png";
+		var highlightShrink = "";
+		var HighlightHeightLimit = "";
+	</script>
+	
+	<!-- Analytics -->
+
+    
+        <!-- Busuanzi Analytics -->
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    
+    
+
+
+	
+		
+<script src="/js/plugins/photoFigcaption.js"></script>
+
+	
+
+	
+
+    
+		
+<script src="/js/plugins/replaceSpacesWithNbsp.js"></script>
+
+	
+
+	
+	
+	
+		<script>
+			if (typeof init === 'function') {
+				init();
+			}
+		</script>
+	
+
+	
+		
+	
+
+	
+
+	<!--
+		
+<script src="/js/plugins/jquery.pjax.min.js"></script>
+
+		<script>
+			$(document).pjax('a[target!=_blank]', 'main', {
+				fragment: 'main',
+				timeout: 8000
+			});
+
+			$(document).on('pjax:complete', function() {
+			});
+		</script> 
+	-->
+	<script>
+		console.log('\n %c Hexo-Quieter 主题 %c https://github.com/GZ-Metal-Cell/hexo-theme-quieter \n', 'color: #fadfa3; background: #030307; padding:5px 0;', 'background: #fadfa3; padding:5px 0;')
+	</script>
+</footer>
+	</body>
+
+	<!-- Hexo-Quieter 主题  https://github.com/GZ-Metal-Cell/hexo-theme-quieter -->
+</html>
+
