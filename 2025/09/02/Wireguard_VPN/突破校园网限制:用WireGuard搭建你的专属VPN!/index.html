@@ -362,11 +362,10 @@
 </header>
         <div class="post-content article-container">
             <article class="post-content-info">
-                <h1 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract:"></a>Abstract:</h1><p>你是否也遇到过这样的窘境：在宿舍里，和同学的设备明明连接着同一个 Wi-Fi，却仿佛身处两个世界，无法互相访问？无论是想和小伙伴联机打一把游戏，或是方便地共享文件，甚至是远程访问自己搭建在宿舍的树莓派，都会因为设备间无法 <code>ping</code> 通而宣告失败。这背后的“罪魁祸首”，便是校园网为了网络安全和管理而普遍启用的 AP 隔离（AP Isolation）技术。</p>
-<p>别担心！本文将手把手带你利用一台云服务器和现代、轻量、高效的 WireGuard 工具，轻松搭建一个属于你自己的虚拟局域网（VPN），彻底突破校园网的限制，让你名下的所有设备都能自由地“握手”和通信。</p>
+                <h1 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract:"></a>Abstract:</h1><p>你是否也遇到过这样的窘境：在宿舍里，和同学的设备明明连接着同一个 Wi-Fi，却仿佛身处两个世界，无法互相访问？无论是想和小伙伴局域网联机打一把游戏，或是方便地共享文件，甚至是远程访问自己搭建在宿舍的树莓派，都会因为设备间无法 <code>ping</code> 通而宣告失败。这背后的“罪魁祸首”，便是校园网为了网络安全和管理而普遍启用的 AP 隔离（AP Isolation）技术。<br>本文将手把手带你利用一台云服务器和WireGuard，轻松搭建一个属于你自己的虚拟局域网（VPN），彻底解决校园网的ap隔离，使你使用的设备都能自由地“握手”和通信。</p>
 <h1 id="准备工作："><a href="#准备工作：" class="headerlink" title="准备工作："></a>准备工作：</h1><ol>
 <li><strong>一台云服务器</strong>：主流的云服务商均可（如阿里云、腾讯云、AWS、Vultr等），许多厂商还为学生提供专属优惠。为了获得最佳体验，建议选择地理位置靠近你学校的机房，以确保更低的延迟。<ul>
-<li><strong>操作系统</strong>：推荐选择 <strong>Ubuntu 20.04 LTS</strong> 或 <strong>22.04 LTS</strong>，这两个版本对 WireGuard 的支持更为原生和稳定。</li>
+<li><strong>操作系统</strong>：推荐选择 <strong>Ubuntu 20.04 LTS</strong> 或 <strong>22.04 LTS</strong>，这两个版本对 WireGuard 的支持更稳定。</li>
 <li><strong>重要提醒</strong>：请务必确保云服务器的<strong>安全组（或防火墙）</strong> 规则已经放行了 WireGuard 计划使用的端口。本文后续教程将使用默认的 <code>UDP 51820</code> 端口。<strong>这是新手最容易踩的坑，没有之一！</strong></li>
 </ul>
 </li>
@@ -531,6 +530,19 @@
 
 <div class="post-bottom">
     
+        <div class="post-paging">     
+            <div class="post-paging-last">
+                
+                    <a href="/2025/09/24/ICS-PA1/PA1_Report/">
+                        上一篇：PA1_Report
+                    </a>
+                
+            </div>
+            <div class="post-paging-next">
+                
+            </div>
+        </div>
+    
     
     
         
@@ -559,15 +571,15 @@
             <div class="aside-top-about-site">
                 <a href="/categories" class="aside-top-about-site-item">
                     <span class="title">类别</span>
-                    <span class="count">1</span>
+                    <span class="count">2</span>
                 </a>
                 <a href="/tags" class="aside-top-about-site-item">
                     <span class="title">标签</span>
-                    <span class="count">2</span>
+                    <span class="count">4</span>
                 </a>
                 <a href="/archives" class="aside-top-about-site-item">
                     <span class="title">归档</span>
-                    <span class="count">1</span>
+                    <span class="count">2</span>
                 </a>
             </div>
             <div class="aside-top-about-contact">
