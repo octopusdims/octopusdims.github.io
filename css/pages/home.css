@@ -1,0 +1,215 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+.home .post-card-container {
+  display: flex;
+  flex-direction: column;
+  margin-top: 0px;
+}
+.home .post-card-container .post-card {
+  display: flex;
+  max-width: 100%;
+  padding: 0 calc((100% - 1280px) / 2);
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: stretch;
+  margin-top: 360px;
+}
+.home .post-card-container .post-card-display {
+  flex-basis: 320px;
+  display: flex;
+  flex-grow: 1;
+  flex-shrink: 1;
+  position: relative;
+  min-height: 440px;
+  width: 360px;
+  max-width: 360px;
+  margin: 20px;
+  background-color: var(--background-primary);
+  border-radius: 10px;
+  outline: 1px solid rgba(150, 150, 150, 0.05);
+  box-shadow: 4px 5px 2px 0 rgba(50, 50, 50, 0.05);
+  flex-direction: column;
+  transition: all 0.3s ease-out;
+}
+.home .post-card-container .post-card-display:hover {
+  transform: translateY(-15px);
+}
+.home .post-card-container .post-card-display-item {
+  text-decoration: none;
+  flex-grow: 1;
+}
+.home .post-card-container .post-card-display-item .post-card-top {
+  display: flex;
+  min-height: 60px;
+  padding: 20px 25px;
+  color: var(--text-primary);
+  justify-content: space-between;
+  flex-direction: column;
+  justify-content: center;
+}
+.home .post-card-container .post-card-display-item .post-card-top-title {
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 30px;
+  color: var(--text-primary);
+  text-decoration: none;
+  z-index: 2;
+}
+.home .post-card-container .post-card-display-item .post-card-top .sticky {
+  width: 18px;
+  height: 18px;
+  margin-top: -60px;
+  position: absolute;
+  right: 10px;
+}
+.home .post-card-container .post-card-display-item:hover .post-card-top-title {
+  color: var(--text-link);
+}
+.home .post-card-container .post-card-display-item .img-container {
+  width: 100%;
+  height: 215px;
+  position: relative;
+}
+.home .post-card-container .post-card-display-item .img-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.home .post-card-container .post-card-description {
+  padding: 15px;
+  text-align: right;
+  flex-grow: 1;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5em;
+  z-index: 2;
+  color: var(--text-secondary);
+  transition: color 0.5s ease-in-out;
+}
+.home .post-card-container .post-card-meat {
+  display: flex;
+  padding: 0 24px 24px 24px;
+  justify-content: space-between;
+}
+.home .post-card-container .post-card-meat .meat-info {
+  display: flex;
+  flex-direction: column;
+}
+.home .post-card-container .post-card-meat .meat-info .info-category {
+  display: flex;
+  z-index: 2;
+  align-items: center;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+.home .post-card-container .post-card-meat .meat-info .info-category:hover {
+  color: var(--text-link);
+  text-decoration: underline;
+}
+.home .post-card-container .post-card-meat .meat-info .info-date {
+  color: var(--text-primary);
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 18px;
+}
+.home .post-card-container .post-card-meat .meat-info .info-date a {
+  color: var(--text-primary);
+  text-decoration: none;
+}
+.home .post-card-container .post-card-meat .meat-info .info-date a:hover {
+  color: var(--text-link);
+  text-decoration: underline;
+}
+.home .post-card-container .meat-type {
+  width: 32px;
+  height: 32px;
+  margin-top: 10px;
+}
+.home .change-page {
+  text-align: center;
+}
+.home .change-page-item {
+  color: var(--background-primary);
+  margin: 45px auto 0;
+  display: inline-block;
+}
+.home .change-page-item a,
+.home .change-page-item span,
+.home .change-page-item .select-container {
+  outline: 1px solid var(--border);
+  height: 42px;
+  line-height: 42px;
+  border-radius: 10px;
+  margin: 4px;
+  transition: all 0.5s ease-in-out;
+  text-align: center;
+  display: inline-block;
+  box-shadow: 2px 3px 2px 0 rgba(50, 50, 50, 0.05);
+}
+.home .change-page-item a,
+.home .change-page-item span {
+  width: 42px;
+  font-size: 18px;
+  background: var(--background-secondary);
+  color: var(--text-secondary);
+}
+.home .change-page-item a:hover,
+.home .change-page-item span:hover {
+  outline: 1px solid var(--text-link);
+}
+.home .change-page-item a {
+  text-decoration: none;
+}
+.home .change-page-item .select-container {
+  background: var(--text-link);
+  color: var(--background-primary);
+  width: 46px;
+}
+.home .change-page-item select {
+  width: 100%;
+  height: 100%;
+  line-height: 42px;
+  font-size: 18px;
+  background: none;
+  border: none;
+  transition: all 0.5s ease-in-out;
+  border-radius: 10px;
+  text-align: center;
+  display: inline-block;
+  color: var(--background-primary);
+}
+.home .change-page-item select option {
+  background-color: var(--background-primary);
+  color: var(--text-primary);
+  transition: color 0.5s ease-in-out;
+}
+@media screen and (max-width: 660px) {
+  .home .post-card-container .post-card-display {
+    margin: 20px 15px;
+  }
+  .home .change-page {
+    margin-top: 0;
+  }
+  .home .change-page-item {
+    margin: 20px 10px 0;
+  }
+  .home .change-page-item a,
+  .home .change-page-item span,
+  .home .change-page-item .select-container {
+    margin: 5px 2px;
+    height: 36px;
+    line-height: 36px;
+  }
+  .home .change-page-item a,
+  .home .change-page-item span {
+    width: 36px;
+  }
+  .home .change-page-item .select-container {
+    width: 40px;
+  }
+}

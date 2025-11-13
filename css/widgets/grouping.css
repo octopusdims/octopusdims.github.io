@@ -1,0 +1,38 @@
+.grouping-item {
+  display: flex;
+  color: var(--text-primary);
+  padding: 10px 15px;
+}
+.grouping-item span {
+  flex-grow: 1;
+  margin-right: 20px;
+}
+.grouping-item time {
+  white-space: nowrap;
+}
+.grouping-item:hover {
+  background: var(--background-tertiary);
+  color: var(--text-link);
+  border-radius: 6px;
+}
+.grouping h1 a,
+.grouping h2 a {
+  color: var(--text-primary);
+}
+.grouping h1 a:hover,
+.grouping h2 a:hover {
+  color: var(--text-link);
+  text-decoration: underline;
+  transition: none;
+}
+.grouping-month,
+.grouping-year {
+  position: relative;
+}
+.grouping-month-list.closed,
+.grouping-year-list.closed {
+  display: none;
+}
+.grouping .grouping-month {
+  padding-top: 5px;
+}
