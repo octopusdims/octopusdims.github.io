@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DIMS|ICS_PA2 实验报告</title>
+  
+  
+  <meta name="description" content="🐙">
+  <meta name="author" content="OCTOPUS">
+  
+  
+  
+  <meta property="og:url" content="http://localhost:1313/2025/11/11/ics_pa2-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/">
+  <meta property="og:site_name" content="DIMS">
+  <meta property="og:title" content="ICS_PA2 实验报告">
+  <meta property="og:description" content="实验进度 我已完成 PA2 的所有内容，并通过了所有的测试样例。
+必答题 不停计算的机器 #include &lt;stdint.h&gt; #include &lt;stdio.h&gt; #define NREG 4 #define NMEM 16 // 定义指令格式 typedef union { struct { uint8_t rs : 2, rt : 2, op : 4; } rtype; struct { uint8_t addr : 4 , op : 4; } mtype; uint8_t inst; } inst_t; #define DECODE_R(inst) uint8_t rt = (inst).rtype.rt, rs = (inst).rtype.rs #define DECODE_M(inst) uint8_t addr = (inst).mtype.addr uint8_t pc = 0; // PC, C语言中没有4位的数据类型, 我们采用8位类型来表示 uint8_t R[NREG] = {}; // 寄存器 uint8_t M[NMEM] = { // 内存, 其中包含一个计算z = x &#43; y的程序 0b11100110, // load 6# | R[0] &lt;- M[y] 0b00000100, // mov r1, r0 | R[1] &lt;- R[0] 0b11100101, // load 5# | R[0] &lt;- M[x] 0b00010001, // add r0, r1 | R[0] &lt;- R[0] &#43; R[1] 0b11110111, // store 7# | M[z] &lt;- R[0] 0b00010000, // x = 16 0b00100001, // y = 33 0b00000000, // z = 0 }; int halt = 0; // 结束标志 // 执行一条指令 void exec_once() { inst_t this; this.inst = M[pc]; // 取指 switch (this.rtype.op) { // 操作码译码 操作数译码 执行 case 0b0000: { DECODE_R(this); R[rt] = R[rs]; break; } case 0b0001: { DECODE_R(this); R[rt] &#43;= R[rs]; break; } case 0b1110: { DECODE_M(this); R[0] = M[addr]; break; } case 0b1111: { DECODE_M(this); M[addr] = R[0]; break; } default: printf(&#34;Invalid instruction with opcode = %x, halting...\n&#34;, this.rtype.op); halt = 1; break; } pc &#43;&#43;; // 更新PC } int main() { while (1) { exec_once(); if (halt) break; } printf(&#34;The result of 16 &#43; 33 is %d\n&#34;, M[7]); return 0; } 问题： 画出在YEMU上执行的加法程序的状态机">
+  <meta property="og:locale" content="zh_CN">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-11-11T14:58:52+00:00">
+    <meta property="article:modified_time" content="2025-11-11T14:58:52+00:00">
+    <meta property="article:tag" content="ICS">
+    <meta property="article:tag" content="PA">
+
+  
+  
+  
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="ICS_PA2 实验报告">
+  <meta name="twitter:description" content="实验进度 我已完成 PA2 的所有内容，并通过了所有的测试样例。
+必答题 不停计算的机器 #include &lt;stdint.h&gt; #include &lt;stdio.h&gt; #define NREG 4 #define NMEM 16 // 定义指令格式 typedef union { struct { uint8_t rs : 2, rt : 2, op : 4; } rtype; struct { uint8_t addr : 4 , op : 4; } mtype; uint8_t inst; } inst_t; #define DECODE_R(inst) uint8_t rt = (inst).rtype.rt, rs = (inst).rtype.rs #define DECODE_M(inst) uint8_t addr = (inst).mtype.addr uint8_t pc = 0; // PC, C语言中没有4位的数据类型, 我们采用8位类型来表示 uint8_t R[NREG] = {}; // 寄存器 uint8_t M[NMEM] = { // 内存, 其中包含一个计算z = x &#43; y的程序 0b11100110, // load 6# | R[0] &lt;- M[y] 0b00000100, // mov r1, r0 | R[1] &lt;- R[0] 0b11100101, // load 5# | R[0] &lt;- M[x] 0b00010001, // add r0, r1 | R[0] &lt;- R[0] &#43; R[1] 0b11110111, // store 7# | M[z] &lt;- R[0] 0b00010000, // x = 16 0b00100001, // y = 33 0b00000000, // z = 0 }; int halt = 0; // 结束标志 // 执行一条指令 void exec_once() { inst_t this; this.inst = M[pc]; // 取指 switch (this.rtype.op) { // 操作码译码 操作数译码 执行 case 0b0000: { DECODE_R(this); R[rt] = R[rs]; break; } case 0b0001: { DECODE_R(this); R[rt] &#43;= R[rs]; break; } case 0b1110: { DECODE_M(this); R[0] = M[addr]; break; } case 0b1111: { DECODE_M(this); M[addr] = R[0]; break; } default: printf(&#34;Invalid instruction with opcode = %x, halting...\n&#34;, this.rtype.op); halt = 1; break; } pc &#43;&#43;; // 更新PC } int main() { while (1) { exec_once(); if (halt) break; } printf(&#34;The result of 16 &#43; 33 is %d\n&#34;, M[7]); return 0; } 问题： 画出在YEMU上执行的加法程序的状态机">
+
+  
+  
+  <script>
+    (function() {
+      
+      document.documentElement.classList.add('dark');
+      localStorage.theme = 'dark';
+    })();
+  </script>
+  
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  
+  <link rel="icon" type="image/webp" href="/images/favicon.webp">
+  
+  
+  
+  <link rel="stylesheet" href="/css/index.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  
+  
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  
+</head>
+<body class=" is-post">
+  
+<div class="floating-shapes">
+  <span class="shape" style="--delay:0s;--x:15%;--y:25%">✦</span>
+  <span class="shape" style="--delay:1.2s;--x:85%;--y:15%">○</span>
+  <span class="shape" style="--delay:2.5s;--x:75%;--y:65%">✦</span>
+  <span class="shape" style="--delay:0.8s;--x:10%;--y:55%">○</span>
+  <span class="shape" style="--delay:1.8s;--x:90%;--y:45%">✦</span>
+  <span class="shape" style="--delay:3s;--x:25%;--y:80%">○</span>
+</div>
+
+  <header class="header" data-glass-nav data-liquid-glass="header">
+  <div class="header-inner">
+    <a href="/" class="logo">
+      <span class="logo-text">DIMS</span>
+    </a>
+    
+    <nav class="nav">
+      
+        <a href="/" class="nav-link">
+          主页
+        </a>
+      
+        <a href="/archives" class="nav-link">
+          归档
+        </a>
+      
+        <a href="/gallery" class="nav-link">
+          相册
+        </a>
+      
+        <a href="/about" class="nav-link">
+          关于
+        </a>
+      
+    </nav>
+    
+    <div class="header-actions">
+      
+      <button class="icon-btn search-toggle" aria-label="Search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="m21 21-4.35-4.35"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+
+<div class="search-modal" id="searchModal">
+  <div class="search-container">
+    <div class="search-box">
+      <input type="text" class="search-input" id="searchInput" placeholder="搜索文章..." autocomplete="off">
+      <button class="icon-btn search-close" id="searchClose" aria-label="Close search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="search-results" id="searchResults"></div>
+    <div class="search-footer">
+      <span class="search-hint">按 <kbd>ESC</kbd> 关闭</span>
+      <span class="search-hint"><kbd>↑</kbd> <kbd>↓</kbd> 选择</span>
+      <span class="search-hint"><kbd>Enter</kbd> 打开</span>
+    </div>
+  </div>
+</div>
+
+  
+  <main class="main">
+    <div class="layout layout-full">
+      <section class="content content-full">
+        
+<article class="post">
+  
+  <div class="container">
+    <header class="post-header">
+      <h1 class="post-title">ICS_PA2 实验报告</h1>
+      <div class="post-meta">
+        <time class="post-date" datetime="2025-11-11T14:58:52Z">2025年11月11日</time>
+        
+          <span class="post-categories">
+            
+              <a href="/categories/%E6%8A%A5%E5%91%8A/" class="category-link">报告</a>
+            
+          </span>
+        
+        
+          <span class="post-wordcount">1771 字</span>
+        
+      </div>
+    </header>
+    
+    <div class="post-body">
+      
+        <aside class="post-toc">
+          <div class="toc-header">
+            <span class="toc-title">目录</span>
+          </div>
+          <div class="toc-content">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#实验进度">实验进度</a></li>
+    <li><a href="#必答题">必答题</a>
+      <ul>
+        <li><a href="#不停计算的机器">不停计算的机器</a></li>
+        <li><a href="#rtfsc2">RTFSC(2)</a></li>
+        <li><a href="#程序如何运行">程序如何运行</a></li>
+        <li><a href="#编译与链接">编译与链接</a></li>
+        <li><a href="#了解makefile">了解Makefile</a></li>
+      </ul>
+    </li>
+    <li><a href="#思考题">思考题</a></li>
+    <li><a href="#有趣的瞬间">有趣的瞬间</a></li>
+    <li><a href="#实验心情">实验心情</a></li>
+  </ul>
+</nav>
+          </div>
+        </aside>
+      
+      
+      <div class="post-content">
+        <h2 id="实验进度">实验进度</h2>
+<p>我已完成 PA2 的<strong>所有内容</strong>，并通过了<strong>所有的测试样例</strong>。</p>
+<hr>
+<h2 id="必答题">必答题</h2>
+<h3 id="不停计算的机器">不停计算的机器</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-C" data-lang="C"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdint.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="cp">#define NREG 4
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define NMEM 16
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="c1">// 定义指令格式
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">typedef</span> <span class="k">union</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="p">{</span> <span class="kt">uint8_t</span> <span class="nl">rs</span> <span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="nl">rt</span> <span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="nl">op</span> <span class="p">:</span> <span class="mi">4</span><span class="p">;</span> <span class="p">}</span> <span class="n">rtype</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="p">{</span> <span class="kt">uint8_t</span> <span class="nl">addr</span> <span class="p">:</span> <span class="mi">4</span>      <span class="p">,</span> <span class="nl">op</span> <span class="p">:</span> <span class="mi">4</span><span class="p">;</span> <span class="p">}</span> <span class="n">mtype</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">uint8_t</span> <span class="n">inst</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span> <span class="kt">inst_t</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="cp">#define DECODE_R(inst) uint8_t rt = (inst).rtype.rt, rs = (inst).rtype.rs
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define DECODE_M(inst) uint8_t addr = (inst).mtype.addr
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">uint8_t</span> <span class="n">pc</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>       <span class="c1">// PC, C语言中没有4位的数据类型, 我们采用8位类型来表示
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">uint8_t</span> <span class="n">R</span><span class="p">[</span><span class="n">NREG</span><span class="p">]</span> <span class="o">=</span> <span class="p">{};</span> <span class="c1">// 寄存器
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">uint8_t</span> <span class="n">M</span><span class="p">[</span><span class="n">NMEM</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>   <span class="c1">// 内存, 其中包含一个计算z = x + y的程序
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="mi">0</span><span class="n">b11100110</span><span class="p">,</span>  <span class="c1">// load  6#     | R[0] &lt;- M[y]
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="mi">0</span><span class="n">b00000100</span><span class="p">,</span>  <span class="c1">// mov   r1, r0 | R[1] &lt;- R[0]
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="mi">0</span><span class="n">b11100101</span><span class="p">,</span>  <span class="c1">// load  5#     | R[0] &lt;- M[x]
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="mi">0</span><span class="n">b00010001</span><span class="p">,</span>  <span class="c1">// add   r0, r1 | R[0] &lt;- R[0] + R[1]
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="mi">0</span><span class="n">b11110111</span><span class="p">,</span>  <span class="c1">// store 7#     | M[z] &lt;- R[0]
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="mi">0</span><span class="n">b00010000</span><span class="p">,</span>  <span class="c1">// x = 16
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="mi">0</span><span class="n">b00100001</span><span class="p">,</span>  <span class="c1">// y = 33
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="mi">0</span><span class="n">b00000000</span><span class="p">,</span>  <span class="c1">// z = 0
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">halt</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">// 结束标志
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="c1">// 执行一条指令
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">exec_once</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">inst_t</span> <span class="n">this</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">this</span><span class="p">.</span><span class="n">inst</span> <span class="o">=</span> <span class="n">M</span><span class="p">[</span><span class="n">pc</span><span class="p">];</span> <span class="c1">// 取指
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">switch</span> <span class="p">(</span><span class="n">this</span><span class="p">.</span><span class="n">rtype</span><span class="p">.</span><span class="n">op</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">//  操作码译码       操作数译码           执行
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">case</span> <span class="mi">0</span><span class="nl">b0000</span><span class="p">:</span> <span class="p">{</span> <span class="nf">DECODE_R</span><span class="p">(</span><span class="n">this</span><span class="p">);</span> <span class="n">R</span><span class="p">[</span><span class="n">rt</span><span class="p">]</span>   <span class="o">=</span> <span class="n">R</span><span class="p">[</span><span class="n">rs</span><span class="p">];</span>   <span class="k">break</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">case</span> <span class="mi">0</span><span class="nl">b0001</span><span class="p">:</span> <span class="p">{</span> <span class="nf">DECODE_R</span><span class="p">(</span><span class="n">this</span><span class="p">);</span> <span class="n">R</span><span class="p">[</span><span class="n">rt</span><span class="p">]</span>  <span class="o">+=</span> <span class="n">R</span><span class="p">[</span><span class="n">rs</span><span class="p">];</span>   <span class="k">break</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">case</span> <span class="mi">0</span><span class="nl">b1110</span><span class="p">:</span> <span class="p">{</span> <span class="nf">DECODE_M</span><span class="p">(</span><span class="n">this</span><span class="p">);</span> <span class="n">R</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>    <span class="o">=</span> <span class="n">M</span><span class="p">[</span><span class="n">addr</span><span class="p">];</span> <span class="k">break</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">case</span> <span class="mi">0</span><span class="nl">b1111</span><span class="p">:</span> <span class="p">{</span> <span class="nf">DECODE_M</span><span class="p">(</span><span class="n">this</span><span class="p">);</span> <span class="n">M</span><span class="p">[</span><span class="n">addr</span><span class="p">]</span> <span class="o">=</span> <span class="n">R</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>    <span class="k">break</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">default</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">      <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;Invalid instruction with opcode = %x, halting...</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">this</span><span class="p">.</span><span class="n">rtype</span><span class="p">.</span><span class="n">op</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="n">halt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">pc</span> <span class="o">++</span><span class="p">;</span> <span class="c1">// 更新PC
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">exec_once</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">halt</span><span class="p">)</span> <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;The result of 16 + 33 is %d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">M</span><span class="p">[</span><span class="mi">7</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p><strong>问题：</strong> 画出在YEMU上执行的加法程序的状态机</p>
+<p><strong>Solution:</strong></p>
+<p>$$\begin{aligned}
+\text{State}_0 &amp;: (PC=0, R[0]=0, R[1]=0, M[7]=0) \
+&amp;\downarrow \text{ (load 6#: } R[0] \leftarrow 33) \
+\text{State}_1 &amp;: (PC=1, R[0]=33, R[1]=0, M[7]=0) \
+&amp;\downarrow \text{ (mov r1, r0: } R[1] \leftarrow 33) \
+\text{State}_2 &amp;: (PC=2, R[0]=33, R[1]=33, M[7]=0) \
+&amp;\downarrow \text{ (load 5#: } R[0] \leftarrow 16) \
+\text{State}_3 &amp;: (PC=3, R[0]=16, R[1]=33, M[7]=0) \
+&amp;\downarrow \text{ (add r0, r1: } R[0] \leftarrow 16+33=49) \
+\text{State}_4 &amp;: (PC=4, R[0]=49, R[1]=33, M[7]=0) \
+&amp;\downarrow \text{ (store 7#: } M[7] \leftarrow 49) \
+\text{State}_5 &amp;: (PC=5, R[0]=49, R[1]=33, M[7]=49) \
+\end{aligned}$$</p>
+<p><strong>问题：</strong> 通过RTFSC理解YEMU如何执行一条指令</p>
+<p><strong>Solution:</strong></p>
+<p>YEMU的指令执行周期（在 <code>exec_once()</code> 函数中）遵循经典的冯·诺依曼周期：<strong>取指 (Fetch)</strong> -&gt; <strong>译码 (Decode)</strong> -&gt; <strong>执行 (Execute)</strong> -&gt; <strong>更新PC (Update PC)</strong>。</p>
+<p>** 1. 取指 (Fetch)**</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl">  <span class="kt">inst_t</span> <span class="n">this</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">this</span><span class="p">.</span><span class="n">inst</span> <span class="o">=</span> <span class="n">M</span><span class="p">[</span><span class="n">pc</span><span class="p">];</span> <span class="c1">// 取指
+</span></span></span></code></pre></div><ul>
+<li>指令存储在内存 <code>M</code> 中。</li>
+<li>程序计数器 <code>pc</code> 给出下一条要执行的指令的地址。</li>
+<li><code>M[pc]</code> 的内容（一个 $\text{uint8_t}$ 值）被取出并存储在 <code>this</code> 联合体中。</li>
+</ul>
+<p>** 2. 译码 (Decode) 和 执行 (Execute)**</p>
+<p>指令的译码和执行是通过 <code>switch (this.rtype.op)</code> 结构完成的，它首先通过 <code>inst_t</code> 联合体的 <code>rtype</code> 结构体字段 <code>op</code> 提取<strong>操作码 (Opcode)</strong>。</p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: center">Opcode (<code>this.rtype.op</code>)</th>
+          <th style="text-align: center">指令类型</th>
+          <th style="text-align: center">译码宏 (Operands)</th>
+          <th style="text-align: center">执行操作 (Execution)</th>
+          <th style="text-align: center">汇编指令</th>
+          <th style="text-align: left">含义</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: center">$\text{0b0000}$ (0)</td>
+          <td style="text-align: center">R-type</td>
+          <td style="text-align: center"><code>DECODE_R</code> ($r_t, r_s$)</td>
+          <td style="text-align: center">$R[r_t] = R[r_s]$</td>
+          <td style="text-align: center"><code>mov rt, rs</code></td>
+          <td style="text-align: left">寄存器间传输</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">$\text{0b0001}$ (1)</td>
+          <td style="text-align: center">R-type</td>
+          <td style="text-align: center"><code>DECODE_R</code> ($r_t, r_s$)</td>
+          <td style="text-align: center">$R[r_t] += R[r_s]$</td>
+          <td style="text-align: center"><code>add rt, rs</code></td>
+          <td style="text-align: left">寄存器加法</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">$\text{0b1110}$ (14)</td>
+          <td style="text-align: center">M-type</td>
+          <td style="text-align: center"><code>DECODE_M</code> ($addr$)</td>
+          <td style="text-align: center">$R[0] = M[addr]$</td>
+          <td style="text-align: center"><code>load addr\#</code></td>
+          <td style="text-align: left"><strong>从内存加载到 $R[0]$</strong></td>
+      </tr>
+      <tr>
+          <td style="text-align: center">$\text{0b1111}$ (15)</td>
+          <td style="text-align: center">M-type</td>
+          <td style="text-align: center"><code>DECODE_M</code> ($addr$)</td>
+          <td style="text-align: center">$M[addr] = R[0]$</td>
+          <td style="text-align: center"><code>store addr\#</code></td>
+          <td style="text-align: left"><strong>从 $R[0]$ 存储到内存</strong></td>
+      </tr>
+  </tbody>
+</table>
+<ul>
+<li><strong>R-type 指令</strong> (<code>mov</code>, <code>add</code>): 使用 $r_type$ 结构体的 $r_t$ (目标寄存器) 和 $r_s$ (源寄存器) 字段来操作寄存器 $R[]$ 中的值。</li>
+<li><strong>M-type 指令</strong> (<code>load</code>, <code>store</code>): 使用 $m_type$ 结构体的 $addr$ (内存地址) 字段来操作内存 $M[]$ 和寄存器 $R[0]$ (隐含目标/源)。</li>
+</ul>
+<p>** 3. 错误处理 (Invalid Opcode)**</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl">    <span class="k">default</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">      <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;Invalid instruction with opcode = %x, halting...</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">this</span><span class="p">.</span><span class="n">rtype</span><span class="p">.</span><span class="n">op</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="n">halt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="k">break</span><span class="p">;</span>
+</span></span></code></pre></div><ul>
+<li>如果取出的指令的操作码不匹配任何已定义的指令（0, 1, 14, 15），则<strong>设置 <code>halt = 1</code> 标志并打印错误信息</strong>，从而导致程序停止运行。</li>
+</ul>
+<p>** 4. 更新PC (Update PC)**</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl">  <span class="n">pc</span> <span class="o">++</span><span class="p">;</span> <span class="c1">// 更新PC
+</span></span></span></code></pre></div><ul>
+<li>无论是成功执行了一条指令，还是遇到了无效指令并设置了 <code>halt</code> 标志，<strong>程序计数器 <code>pc</code> 都会简单地递增 1</strong>，指向内存中的下一个字节。</li>
+</ul>
+<h3 id="rtfsc2">RTFSC(2)</h3>
+<p><strong>问题：</strong> 请整理一条指令在NEMU中的执行过程</p>
+<p><strong>Solution</strong>
+<strong>指令执行流程</strong></p>
+<p>1. <strong>启动执行 (<code>cpu_exec</code>)</strong></p>
+<ul>
+<li>
+<p><code>cpu_exec(uint64_t n)</code>: 这是 CPU 模拟的入口函数，接收要执行的指令数量 $n$。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">cpu_exec</span><span class="p">(</span><span class="kt">uint64_t</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">g_print_step</span> <span class="o">=</span> <span class="p">(</span><span class="n">n</span> <span class="o">&lt;</span> <span class="n">MAX_INST_TO_PRINT</span><span class="p">);</span> <span class="c1">// ITRAC/si 命令的条件
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">switch</span> <span class="p">(</span><span class="n">nemu_state</span><span class="p">.</span><span class="n">state</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">case</span> <span class="nl">NEMU_END</span><span class="p">:</span> <span class="k">case</span> <span class="nl">NEMU_ABORT</span><span class="p">:</span> <span class="k">case</span> <span class="nl">NEMU_QUIT</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="cm">/* ... 状态检查 ... */</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">default</span><span class="o">:</span> <span class="n">nemu_state</span><span class="p">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">NEMU_RUNNING</span><span class="p">;</span> <span class="c1">// 设置运行状态
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kt">uint64_t</span> <span class="n">timer_start</span> <span class="o">=</span> <span class="nf">get_time</span><span class="p">();</span> <span class="c1">// 记录起始时间
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="nf">execute</span><span class="p">(</span><span class="n">n</span><span class="p">);</span> <span class="c1">// **进入执行循环**
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="kt">uint64_t</span> <span class="n">timer_end</span> <span class="o">=</span> <span class="nf">get_time</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">g_timer</span> <span class="o">+=</span> <span class="n">timer_end</span> <span class="o">-</span> <span class="n">timer_start</span><span class="p">;</span> <span class="c1">// 更新耗时
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="cm">/* ... 结束状态处理和统计 ... */</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div></li>
+</ul>
+<hr>
+<p>2. <strong>执行循环 (<code>execute</code>)</strong></p>
+<ul>
+<li>
+<p><code>execute(uint64_t n)</code>: 循环 $n$ 次，在每次迭代中执行一条指令。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">static</span> <span class="kt">void</span> <span class="nf">execute</span><span class="p">(</span><span class="kt">uint64_t</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Decode</span> <span class="n">s</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="p">(;</span><span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">;</span> <span class="n">n</span> <span class="o">--</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">exec_once</span><span class="p">(</span><span class="o">&amp;</span><span class="n">s</span><span class="p">,</span> <span class="n">cpu</span><span class="p">.</span><span class="n">pc</span><span class="p">);</span> <span class="c1">// 执行单条指令
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">g_nr_guest_inst</span> <span class="o">++</span><span class="p">;</span> <span class="c1">// 指令计数更新
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nf">trace_and_difftest</span><span class="p">(</span><span class="o">&amp;</span><span class="n">s</span><span class="p">,</span> <span class="n">cpu</span><span class="p">.</span><span class="n">pc</span><span class="p">);</span> <span class="c1">// 追踪、对比、检查监视点
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="k">if</span> <span class="p">(</span><span class="n">nemu_state</span><span class="p">.</span><span class="n">state</span> <span class="o">!=</span> <span class="n">NEMU_RUNNING</span><span class="p">)</span> <span class="k">break</span><span class="p">;</span> <span class="c1">// 检查状态，若暂停/结束则退出循环
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nf">IFDEF</span><span class="p">(</span><span class="n">CONFIG_DEVICE</span><span class="p">,</span> <span class="nf">device_update</span><span class="p">());</span> <span class="c1">// 设备更新
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div></li>
+</ul>
+<hr>
+<p>3. <strong>单步执行 (<code>exec_once</code>)</strong></p>
+<p>这是执行一条指令的核心步骤：</p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">步骤</th>
+          <th style="text-align: left">函数/宏</th>
+          <th style="text-align: left">描述</th>
+          <th style="text-align: left">对应的代码片段 (<code>exec_once</code>)</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left"><strong>I. 设置 PC</strong></td>
+          <td style="text-align: left"><code>s-&gt;pc = pc;</code></td>
+          <td style="text-align: left">将当前的 <strong>程序计数器 (PC)</strong> 存入 <code>Decode</code> 结构体 $s$ 中。</td>
+          <td style="text-align: left"><code>s-&gt;pc = pc;</code></td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>II. 指令解码与执行</strong></td>
+          <td style="text-align: left"><code>isa_exec_once(s);</code></td>
+          <td style="text-align: left"><strong>ISA 相关操作。</strong> 负责取指、解码、执行指令，并计算出下一条指令的地址 (Next PC, <code>s-&gt;dnpc</code>)。</td>
+          <td style="text-align: left"><code>isa_exec_once(s);</code></td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>III. 更新 PC</strong></td>
+          <td style="text-align: left"><code>cpu.pc = s-&gt;dnpc;</code></td>
+          <td style="text-align: left">将 CPU 的全局 PC 更新为执行结果计算出的 <strong>下一条指令地址</strong> (<code>s-&gt;dnpc</code>)。</td>
+          <td style="text-align: left"><code>cpu.pc = s-&gt;dnpc;</code></td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>IV. FTRACE</strong></td>
+          <td style="text-align: left"><code>CONFIG_FTRACE</code>, <code>ftrace_log(...)</code></td>
+          <td style="text-align: left"><strong>函数调用追踪</strong>：记录函数调用和返回信息。</td>
+          <td style="text-align: left"><code>#ifdef CONFIG_FTRACE ... ftrace_log(...) ... #endif</code></td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>V. ITRACE/IRINGBUF</strong></td>
+          <td style="text-align: left"><code>CONFIG_ITRACE</code>, <code>push_iringbuf(...)</code></td>
+          <td style="text-align: left"><strong>指令追踪</strong>：格式化指令信息（机器码、汇编）并存入日志缓冲区 <code>s-&gt;logbuf</code>，然后推入环形缓冲区。</td>
+          <td style="text-align: left"><code>#ifdef CONFIG_ITRACE ... disassemble(...) ... push_iringbuf(...) ... #endif</code></td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<p>4. <strong>追踪与检查 (<code>trace_and_difftest</code>)</strong></p>
+<p>在 <code>exec_once</code> 之后，<code>execute</code> 函数调用 <code>trace_and_difftest</code>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">static</span> <span class="kt">void</span> <span class="nf">trace_and_difftest</span><span class="p">(</span><span class="n">Decode</span> <span class="o">*</span><span class="n">_this</span><span class="p">,</span> <span class="kt">vaddr_t</span> <span class="n">dnpc</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#ifdef CONFIG_ITRACE_COND </span><span class="c1">// CONFIG_ITRACE_COND 配置的追踪条件
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">if</span> <span class="p">(</span><span class="n">ITRACE_COND</span><span class="p">)</span> <span class="p">{</span> <span class="nf">log_write</span><span class="p">(</span><span class="s">&#34;%s</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">_this</span><span class="o">-&gt;</span><span class="n">logbuf</span><span class="p">);</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#endif
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>  <span class="k">if</span> <span class="p">(</span><span class="n">g_print_step</span><span class="p">)</span> <span class="p">{</span> <span class="nf">IFDEF</span><span class="p">(</span><span class="n">CONFIG_ITRACE</span><span class="p">,</span> <span class="nf">puts</span><span class="p">(</span><span class="n">_this</span><span class="o">-&gt;</span><span class="n">logbuf</span><span class="p">));</span> <span class="p">}</span> <span class="c1">// MAX_INST_TO_PRINT 控制的单步输出
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  
+</span></span><span class="line"><span class="cl">  <span class="nf">IFDEF</span><span class="p">(</span><span class="n">CONFIG_DIFFTEST</span><span class="p">,</span> <span class="nf">difftest_step</span><span class="p">(</span><span class="n">_this</span><span class="o">-&gt;</span><span class="n">pc</span><span class="p">,</span> <span class="n">dnpc</span><span class="p">));</span> <span class="c1">// **双机对比**
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  
+</span></span><span class="line"><span class="cl"><span class="cp">#ifdef CONFIG_WATCHPOINT </span><span class="c1">// **监视点检查**
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="nf">check_watchpoints</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="n">nemu_state</span><span class="p">.</span><span class="n">state</span> <span class="o">==</span> <span class="n">NEMU_STOP</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;Watchpoint triggered!</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#endif
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="p">}</span>
+</span></span></code></pre></div><p>5. <strong>状态更新</strong></p>
+<ul>
+<li><strong>指令计数更新</strong>:
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">g_nr_guest_inst</span> <span class="o">++</span><span class="p">;</span>
+</span></span></code></pre></div></li>
+<li><strong>状态检查</strong>:
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="n">nemu_state</span><span class="p">.</span><span class="n">state</span> <span class="o">!=</span> <span class="n">NEMU_RUNNING</span><span class="p">)</span> <span class="k">break</span><span class="p">;</span>
+</span></span></code></pre></div></li>
+<li><strong>设备更新 (DEVICE)</strong>:
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="nf">IFDEF</span><span class="p">(</span><span class="n">CONFIG_DEVICE</span><span class="p">,</span> <span class="nf">device_update</span><span class="p">());</span>
+</span></span></code></pre></div></li>
+</ul>
+<hr>
+<p>6. <strong>结束统计</strong></p>
+<ul>
+<li>
+<p>执行循环结束后，<code>cpu_exec</code> 函数继续执行，并根据最终的 <code>nemu_state.state</code> 决定后续动作，最终调用 <code>statistic()</code> 打印统计数据：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// cpu_exec
+</span></span></span><span class="line"><span class="cl"><span class="c1">// ... 
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">switch</span> <span class="p">(</span><span class="n">nemu_state</span><span class="p">.</span><span class="n">state</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">case</span> <span class="nl">NEMU_RUNNING</span><span class="p">:</span> <span class="n">nemu_state</span><span class="p">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">NEMU_STOP</span><span class="p">;</span> <span class="k">break</span><span class="p">;</span> <span class="c1">// 执行完毕 n 条指令后，设为 NEMU_STOP
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">  <span class="k">case</span> <span class="nl">NEMU_END</span><span class="p">:</span> <span class="k">case</span> <span class="nl">NEMU_ABORT</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">Log</span><span class="p">(</span><span class="s">&#34;nemu: %s at pc = &#34;</span> <span class="n">FMT_WORD</span><span class="p">,</span> <span class="cm">/* ... */</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// fall through
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">case</span> <span class="nl">NEMU_QUIT</span><span class="p">:</span> <span class="nf">statistic</span><span class="p">();</span> <span class="c1">// 遇到 END/ABORT/QUIT 则打印统计数据
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></div></li>
+</ul>
+<hr>
+<p><strong>关键数据结构</strong></p>
+<ul>
+<li>
+<p><strong><code>CPU_state cpu</code></strong>: 全局变量，存储 CPU 寄存器状态和 <code>pc</code>。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">CPU_state</span> <span class="n">cpu</span> <span class="o">=</span> <span class="p">{};</span>
+</span></span></code></pre></div></li>
+<li>
+<p><strong><code>Decode s</code></strong>: 局部变量，用于存储<strong>单条</strong>指令的执行上下文。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">Decode</span> <span class="n">s</span><span class="p">;</span> <span class="c1">// 在 execute 函数内局部声明
+</span></span></span></code></pre></div></li>
+</ul>
+<h3 id="程序如何运行">程序如何运行</h3>
+<p><strong>问题：</strong> 请你以打字小游戏为例, 结合&quot;程序在计算机上运行&quot;的两个视角, 来剖析打字小游戏究竟是如何在计算机上运行的. 具体地, 当你按下一个字母并命中的时候, 整个计算机系统(NEMU, ISA, AM, 运行时环境, 程序) 是如何协同工作, 从而让打字小游戏实现出&quot;命中&quot;的游戏效果?</p>
+<p><strong>Solution</strong>
+<img src="Typing_Game.png" alt="Typing Game">
+<strong>微观视角(程序)</strong>
+1. <strong>程序结构和逻辑</strong></p>
+<p>打字小游戏的核心是<strong>事件驱动</strong>和<strong>帧同步</strong>的循环：</p>
+<ul>
+<li><strong>数据结构:</strong> <code>struct character chars[NCHAR]</code> 存储了屏幕上每个下落字母的状态（字符、位置 <code>x, y</code>、速度 <code>v</code>、状态计时 <code>t</code>）。</li>
+<li><strong>游戏主循环 (<code>main</code>):</strong>
+<ul>
+<li>通过 <code>io_read(AM_TIMER_UPTIME).us</code> 获取当前时间，计算出应该渲染的帧数 (<code>frames</code>)，实现<strong>帧同步</strong>。</li>
+<li><strong>更新逻辑 (<code>game_logic_update</code>):</strong> 在 <code>current &lt; frames</code> 的循环中，模拟字母下落、生成新字母、判断输入字母是否正确等游戏逻辑。</li>
+<li><strong>输入处理 (<code>io_read(AM_INPUT_KEYBRD)</code>):</strong> 循环读取键盘事件，并调用 <code>check_hit</code> 函数处理按键。</li>
+<li><strong>渲染 (<code>render</code>):</strong> 当有新的逻辑更新时 (<code>current &gt; rendered</code>)，调用 <code>render</code> 将新的游戏状态绘制到屏幕。</li>
+</ul>
+</li>
+</ul>
+<p>2. <strong>“命中”事件的程序逻辑</strong></p>
+<p>当按下键盘上一个字母（如 &lsquo;A&rsquo;）时：</p>
+<ol>
+<li>
+<p><strong>读取输入:</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// main 函数中的输入处理
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">AM_INPUT_KEYBRD_T</span> <span class="n">ev</span> <span class="o">=</span> <span class="nf">io_read</span><span class="p">(</span><span class="n">AM_INPUT_KEYBRD</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="n">ev</span><span class="p">.</span><span class="n">keydown</span> <span class="o">&amp;&amp;</span> <span class="n">lut</span><span class="p">[</span><span class="n">ev</span><span class="p">.</span><span class="n">keycode</span><span class="p">])</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">check_hit</span><span class="p">(</span><span class="n">lut</span><span class="p">[</span><span class="n">ev</span><span class="p">.</span><span class="n">keycode</span><span class="p">]);</span> <span class="c1">// 调用命中检测
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></div><p>程序通过 <code>io_read(AM_INPUT_KEYBRD)</code> 接口从抽象的<strong>输入设备</strong>获取按键事件 (<code>ev</code>)。如果是一个有效的<strong>按下</strong>事件 (<code>ev.keydown</code>)，则将原始键码 (<code>ev.keycode</code>) 通过查找表 <code>lut</code> 转换为字符，并传递给 <code>check_hit</code>。</p>
+</li>
+<li>
+<p><strong>命中检测和更新状态 (<code>check_hit</code>):</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">check_hit</span><span class="p">(</span><span class="kt">char</span> <span class="n">ch</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// 遍历所有字母，找到与按键匹配且正在下落的**最靠下**的字母
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// ... 找到命中的字母索引 m
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">if</span> <span class="p">(</span><span class="n">m</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">wrong</span><span class="o">++</span><span class="p">;</span> <span class="c1">// 未命中
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">hit</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">chars</span><span class="p">[</span><span class="n">m</span><span class="p">].</span><span class="n">v</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">screen_h</span> <span class="o">-</span> <span class="n">CHAR_H</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">FPS</span><span class="p">);</span> <span class="c1">// 关键：速度设为负值，使其向上飞出
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><ul>
+<li>程序遍历 <code>chars</code> 数组，寻找字符 <code>c-&gt;ch</code> 与按键 <code>ch</code> 相同，并且速度 <code>c-&gt;v &gt; 0</code>（即<strong>正在下落</strong>）的字母。</li>
+<li>为了符合“打中<strong>最快要掉落的</strong>”的游戏规则，它找到的是<strong>最靠下</strong> (<code>c-&gt;y</code> 最大) 的那个。</li>
+<li><strong>命中效果实现:</strong> 将被击中字母的速度 <code>chars[m].v</code> 设置为一个<strong>负值</strong>，使其开始<strong>向上飞出</strong>。</li>
+</ul>
+</li>
+<li>
+<p><strong>渲染命中效果 (<code>render</code>):</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// render 函数中决定绘制颜色
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">int</span> <span class="n">col</span> <span class="o">=</span> <span class="p">(</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">v</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">?</span> <span class="nl">WHITE</span> <span class="p">:</span> <span class="p">(</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">v</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="o">?</span> <span class="nl">GREEN</span> <span class="p">:</span> <span class="n">RED</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="nf">io_write</span><span class="p">(</span><span class="n">AM_GPU_FBDRAW</span><span class="p">,</span> <span class="n">c</span><span class="o">-&gt;</span><span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="o">-&gt;</span><span class="n">y</span><span class="p">,</span> <span class="n">texture</span><span class="p">[</span><span class="n">col</span><span class="p">][</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">ch</span> <span class="o">-</span> <span class="sc">&#39;A&#39;</span><span class="p">],</span> <span class="n">CHAR_W</span><span class="p">,</span> <span class="n">CHAR_H</span><span class="p">,</span> <span class="nb">false</span><span class="p">);</span>
+</span></span></code></pre></div><p>在下一个渲染周期，由于被命中的字母 <code>c</code> 的速度 <code>c-&gt;v &lt; 0</code>，<code>render</code> 函数会为其选择 <code>GREEN</code> 颜色，并使用 <code>io_write(AM_GPU_FBDRAW)</code> 将其绘制到屏幕上，从而实现了“字母变绿向上飞出”的<strong>命中视觉效果</strong>。</p>
+</li>
+</ol>
+<hr>
+<p><strong>宏观视角</strong></p>
+<p>1. <strong>抽象中间层 (AM)</strong></p>
+<p><strong>AM (Abstract Machine)</strong> 提供了与底层硬件抽象接口，是连接上层程序和底层硬件/模拟器的桥梁。</p>
+<ul>
+<li>
+<p><strong>输入抽象:</strong></p>
+<ul>
+<li><code>AM_INPUT_KEYBRD</code> 是对<strong>键盘硬件</strong>的抽象。</li>
+<li>当程序调用 <code>io_read(AM_INPUT_KEYBRD)</code> 时，AM 会负责与<strong>键盘设备</strong>交互，获取按键的<strong>键码</strong>和<strong>状态</strong>（按下/松开），并以统一的 <code>AM_INPUT_KEYBRD_T</code> 结构体形式返回给程序。</li>
+</ul>
+</li>
+<li>
+<p><strong>图形抽象:</strong></p>
+<ul>
+<li><code>AM_GPU_FBDRAW</code> 是对<strong>显卡帧缓冲区 (Framebuffer)</strong> 的抽象。</li>
+<li>当程序调用 <code>io_write(AM_GPU_FBDRAW, ...)</code> 时，AM 会负责将像素数据写入显卡的内存区域，驱动显示更新。</li>
+</ul>
+</li>
+</ul>
+<p>2. <strong>指令集架构 (ISA)</strong></p>
+<p>无论是程序逻辑 (<code>check_hit</code> 中的比较和赋值) 还是 AM 接口的调用，最终都编译成目标 ISA（如 RISC-V）的<strong>机器指令</strong>。</p>
+<ul>
+<li>例如，在 <code>check_hit</code> 中将速度设置为负数的 C 代码：
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">chars</span><span class="p">[</span><span class="n">m</span><span class="p">].</span><span class="n">v</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">screen_h</span> <span class="o">-</span> <span class="n">CHAR_H</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">FPS</span><span class="p">);</span>
+</span></span></code></pre></div>将被编译器翻译成一系列的 ISA 指令（如加载、减法、除法、取反、存储等），通过这些指令这些指令操作<strong>寄存器</strong>和<strong>内存</strong>。</li>
+</ul>
+<p>3. <strong>执行环境 (NEMU)</strong></p>
+<p><strong>NEMU (NJU EMUlator)</strong> 是一个<strong>指令集模拟器</strong>，它负责模拟一个真实 CPU 的行为，执行上述 ISA 指令。</p>
+<ul>
+<li><strong>执行程序逻辑:</strong> NEMU 逐条取指、译码、执行，完成 <code>check_hit</code> 内部的逻辑判断和数据修改（如修改 <code>chars[m].v</code> 的内存值）。</li>
+<li><strong>模拟 I/O 交互 (I/O Mapped Memory / Memory Mapped I/O):</strong>
+<ul>
+<li>当程序执行到涉及 <code>io_read</code> 或 <code>io_write</code> 的指令时，它实际上是在访问一个<strong>特定的内存地址</strong>（即<strong>设备寄存器</strong>）。</li>
+<li><strong>读取输入:</strong> 当 NEMU 发现 CPU 试图读取键盘设备寄存器时（通过 AM 抽象），NEMU 会暂停模拟，<strong>查询主机操作系统的键盘事件</strong>，并根据事件状态<strong>伪造</strong>一个设备返回值（<code>AM_INPUT_KEYBRD_T</code>），模拟键盘数据准备就绪。</li>
+<li><strong>渲染输出:</strong> 当 NEMU 发现 CPU 试图写入帧缓冲区地址时（通过 <code>io_write(AM_GPU_FBDRAW, ...)</code>），NEMU 会将该数据<strong>转发</strong>到<strong>主机操作系统的图形界面</strong>上，实现屏幕像素的更新。</li>
+</ul>
+</li>
+</ul>
+<h3 id="编译与链接">编译与链接</h3>
+<p><strong>问题：</strong> 分别尝试去掉static, 去掉inline或去掉两者, 然后重新进行编译,请分别解释为什么这些错误会发生/不发生?</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-C" data-lang="C"><span class="line"><span class="cl"><span class="cp">#ifndef __CPU_IFETCH_H__
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;memory/vaddr.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="k">static</span> <span class="kr">inline</span> <span class="kt">uint32_t</span> <span class="nf">inst_fetch</span><span class="p">(</span><span class="kt">vaddr_t</span> <span class="o">*</span><span class="n">pc</span><span class="p">,</span> <span class="kt">int</span> <span class="n">len</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">uint32_t</span> <span class="n">inst</span> <span class="o">=</span> <span class="nf">vaddr_ifetch</span><span class="p">(</span><span class="o">*</span><span class="n">pc</span><span class="p">,</span> <span class="n">len</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">(</span><span class="o">*</span><span class="n">pc</span><span class="p">)</span> <span class="o">+=</span> <span class="n">len</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="n">inst</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="cp">#endif
+</span></span></span></code></pre></div><p><strong>Solution</strong>
+<strong>单独去掉 <code>static</code> (保留 <code>inline</code>)</strong></p>
+<ul>
+<li><strong>结果：</strong> <strong>不报错</strong> (链接器处理)。</li>
+<li><strong>原因：</strong> <code>inline</code> 函数在头文件中定义且为外部链接。现代链接器（如 GNU ld）会将多个目标文件中生成的函数定义视为<strong>弱符号</strong>，并自动选择其中一个作为最终的外部定义，避免了多重定义错误。</li>
+</ul>
+<p><strong>单独去掉 <code>inline</code> (保留 <code>static</code>)</strong></p>
+<ul>
+<li><strong>结果：</strong> <strong>不报错</strong> (内部链接)。</li>
+<li><strong>原因：</strong> <code>static</code> 将函数的链接性限制为<strong>内部链接</strong>。每个包含该头文件的 <code>.c</code> 文件都会拥有一个该函数的私有副本，互相隔离，链接器看不到冲突的符号。</li>
+</ul>
+<p><strong>同时去掉两者</strong></p>
+<ul>
+<li><strong>结果：</strong> <strong>链接错误</strong>。</li>
+<li><strong>原因：</strong> 函数成为一个普通的<strong>外部链接</strong>函数。由于头文件被多个源文件包含，链接器会在最终的可执行文件中发现多个目标文件都定义了同名的<strong>强符号</strong>，违反了 C 语言的<strong>单一定义原则</strong>（One Definition Rule, ODR），导致 <code>multiple definition</code> 链接错误。</li>
+</ul>
+<p><strong>问题：</strong></p>
+<ul>
+<li>1.在nemu/inclu/common.h中添加一行volatile static int dummy; 然后重新编译NEMU. 请问重新编译后的NEMU含有多少个dummy变量的实体? 你是如何得到这个结果的?</li>
+<li>2.添加上题中的代码后, 再在nemu/include/debug.h中添加一行volatile static int dummy; 然后重新编译NEMU. 请问此时的NEMU含有多少个dummy变量的实体? 与上题中dummy变量实体数目进行比较, 并解释本题的结果.</li>
+<li>3.修改添加的代码, 为两处dummy变量进行初始化:volatile static int dummy = 0; 然后重新编译NEMU. 你发现了什么问题? 为什么之前没有出现这样的问题? (回答完本题后可以删除添加的代码.)</li>
+</ul>
+<p><strong>Solution</strong></p>
+<ul>
+<li>1.添加代码并编译后，在nemu目录下终端输入<code>nm -a build/riscv32-nemu-interpreter | grep dummy -c</code>返回36
+<img src="dummy.png" alt=""></li>
+<li>2.重复上问步骤，依旧返回36
+<code>volatile static int dummy;</code>未初始化的缘故，<code>dummy</code>是暂定定义。在单个 .c 文件中，即使通过包含多个头文件看到多次相同的定义，编译器也会将它们合并为一个实体。所以依旧含有36个dummy变量的实体</li>
+<li>3.添加代码后编译出现错误</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-Bash" data-lang="Bash"><span class="line"><span class="cl">  octopus@ICS:~/Projects/ics2025/nemu$ make
+</span></span><span class="line"><span class="cl">+ CC src/nemu-main.c
+</span></span><span class="line"><span class="cl">In file included from /home/octopus/Projects/ics2025/nemu/include/utils.h:19,
+</span></span><span class="line"><span class="cl">                 from /home/octopus/Projects/ics2025/nemu/include/debug.h:21,
+</span></span><span class="line"><span class="cl">                 from /home/octopus/Projects/ics2025/nemu/include/common.h:47,
+</span></span><span class="line"><span class="cl">                 from src/nemu-main.c:16:
+</span></span><span class="line"><span class="cl">/home/octopus/Projects/ics2025/nemu/include/common.h:57:21: error: redefinition of ‘dummy’
+</span></span><span class="line"><span class="cl">   <span class="m">57</span> <span class="p">|</span> volatile static int <span class="nv">dummy</span> <span class="o">=</span> 0<span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">|</span>                     ^~~~~
+</span></span><span class="line"><span class="cl">In file included from /home/octopus/Projects/ics2025/nemu/include/debug.h:19,
+</span></span><span class="line"><span class="cl">                 from /home/octopus/Projects/ics2025/nemu/include/common.h:47,
+</span></span><span class="line"><span class="cl">                 from src/nemu-main.c:16:
+</span></span><span class="line"><span class="cl">/home/octopus/Projects/ics2025/nemu/include/common.h:57:21: note: previous definition of ‘dummy’ was here
+</span></span><span class="line"><span class="cl">   <span class="m">57</span> <span class="p">|</span> volatile static int <span class="nv">dummy</span> <span class="o">=</span> 0<span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">|</span>                     ^~~~~
+</span></span><span class="line"><span class="cl">In file included from /home/octopus/Projects/ics2025/nemu/include/common.h:47,
+</span></span><span class="line"><span class="cl">                 from src/nemu-main.c:16:
+</span></span><span class="line"><span class="cl">/home/octopus/Projects/ics2025/nemu/include/debug.h:44:21: error: redefinition of ‘dummy’
+</span></span><span class="line"><span class="cl">   <span class="m">44</span> <span class="p">|</span> volatile static int <span class="nv">dummy</span> <span class="o">=</span> 0<span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">|</span>                     ^~~~~
+</span></span><span class="line"><span class="cl">In file included from /home/octopus/Projects/ics2025/nemu/include/utils.h:19,
+</span></span><span class="line"><span class="cl">                 from /home/octopus/Projects/ics2025/nemu/include/debug.h:21,
+</span></span><span class="line"><span class="cl">                 from /home/octopus/Projects/ics2025/nemu/include/common.h:47,
+</span></span><span class="line"><span class="cl">                 from src/nemu-main.c:16:
+</span></span><span class="line"><span class="cl">/home/octopus/Projects/ics2025/nemu/include/common.h:57:21: note: previous definition of ‘dummy’ was here
+</span></span><span class="line"><span class="cl">   <span class="m">57</span> <span class="p">|</span> volatile static int <span class="nv">dummy</span> <span class="o">=</span> 0<span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">|</span>                     ^~~~~
+</span></span><span class="line"><span class="cl">In file included from src/nemu-main.c:16:
+</span></span><span class="line"><span class="cl">/home/octopus/Projects/ics2025/nemu/include/common.h:57:21: error: redefinition of ‘dummy’
+</span></span><span class="line"><span class="cl">   <span class="m">57</span> <span class="p">|</span> volatile static int <span class="nv">dummy</span> <span class="o">=</span> 0<span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">|</span>                     ^~~~~
+</span></span><span class="line"><span class="cl">In file included from /home/octopus/Projects/ics2025/nemu/include/common.h:47,
+</span></span><span class="line"><span class="cl">                 from src/nemu-main.c:16:
+</span></span><span class="line"><span class="cl">/home/octopus/Projects/ics2025/nemu/include/debug.h:44:21: note: previous definition of ‘dummy’ was here
+</span></span><span class="line"><span class="cl">   <span class="m">44</span> <span class="p">|</span> volatile static int <span class="nv">dummy</span> <span class="o">=</span> 0<span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">|</span>                     ^~~~~
+</span></span><span class="line"><span class="cl">make: *** <span class="o">[</span>/home/octopus/Projects/ics2025/nemu/scripts/build.mk:34: /home/octopus/Projects/ics2025/nemu/build/obj-riscv32-nemu-interpreter/src/nemu-main.o<span class="o">]</span> Error <span class="m">1</span>
+</span></span><span class="line"><span class="cl">octopus@ICS:~/Projects/ics2025/nemu$ 
+</span></span></code></pre></div><p>未初始化时不报错，而现在初始化后报错，根本原因在于变量的定义方式：</p>
+<ul>
+<li>
+<ol>
+<li>
+<p><strong>未初始化时（<code>volatile static int dummy;</code>）：</strong></p>
+<ul>
+<li><code>dummy</code>为暂定定义,即没有存储类说明符和初始化方法的任何外部数据声明。</li>
+<li>在同一个编译单元（单个 <code>.c</code> 文件经过预处理后）内，可以出现同一个变量的多个暂定定义，编译器会将它们合并成一个变量实体。因此，重复包含头文件不会报错。</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>
+<ol start="2">
+<li>
+<p><strong>初始化后（<code>volatile static int dummy = 0;</code>）：</strong></p>
+<ul>
+<li>对全局变量进行初始化（例如 <code>= 0</code>）的行为，在 C 语言中构成一个<strong>强定义</strong>。</li>
+<li>C 语言规范要求，在<strong>单个编译单元</strong>（即单个 <code>.c</code> 文件）中，<strong>不允许对同一个变量进行多次强定义</strong>。</li>
+<li>这违反了“单一定义原则”，因此编译器立即报错 <code>redefinition of 'dummy'</code>。</li>
+</ul>
+</li>
+</ol>
+</li>
+</ul>
+<h3 id="了解makefile">了解Makefile</h3>
+<p><strong>问题：</strong> 请描述你在am-kernels/kernels/hello/目录下敲入make ARCH=$ISA-nemu 后, make程序如何组织.c和.h文件, 最终生成可执行文件am-kernels/kernels/hello/build/hello-$ISA-nemu.elf.
+(这个问题包括两个方面:Makefile的工作方式和编译链接的过程.)
+关于Makefile工作方式的提示:</p>
+<ul>
+<li>Makefile中使用了变量, 包含文件等特性</li>
+<li>Makefile运用并重写了一些implicit rules</li>
+<li>在man make中搜索-n选项, 也许会对你有帮助</li>
+<li>RTFM</li>
+</ul>
+<p><strong>Solution</strong></p>
+<h4 id="1makefile-的工作方式">1.Makefile 的工作方式</h4>
+<p>在 <code>am-kernels/kernels/hello/</code> 目录下执行 <code>make ARCH=$ISA-nemu</code> 后，<code>make</code> 程序会按照以下步骤组织和执行：</p>
+<h5 id="目标与变量确定"><strong>目标与变量确定</strong></h5>
+<ol>
+<li><strong>加载本地 Makefile</strong>：首先加载 <code>am-kernels/kernels/hello/Makefile</code>。
+<ul>
+<li><strong>变量设置</strong>：<code>NAME = hello</code>, <code>SRCS = hello.c</code>。</li>
+</ul>
+</li>
+<li><strong>包含通用 Makefile</strong>：通过 <code>include $(AM_HOME)/Makefile</code> 包含 AbstractMachine 的通用 Makefile。通用 Makefile 中的规则和变量开始生效。</li>
+<li><strong>确定目标</strong>：由于命令行没有指定目标 (<code>MAKECMDGOALS</code> 为空)，根据通用 Makefile 中的设置，默认目标为 <code>image</code> (<code>MAKECMDGOALS = image</code>, <code>.DEFAULT_GOAL = image</code>)。</li>
+<li><strong>环境检查和变量解析</strong>：
+<ul>
+<li>通过 <code>ARCH_SPLIT</code> 和 <code>word</code> 函数，从 <code>ARCH=$ISA-nemu</code> 中解析出 <strong>ISA</strong> (riscv32) 和 <strong>PLATFORM</strong> (<code>nemu</code>)。</li>
+<li><strong>确定路径</strong>：<code>DST_DIR</code> 被设置为 <code>am-kernels/kernels/hello/build/$ARCH-nemu</code>。</li>
+<li><strong>确定最终文件</strong>：<code>IMAGE</code> 变量确定最终可执行文件的路径前缀，最终的 ELF 文件目标是 <code>$(IMAGE).elf</code>，即 <code>am-kernels/kernels/hello/build/hello-$ISA-nemu.elf</code>。</li>
+<li><strong>确定链接文件</strong>：<code>OBJS</code> 变量被设置为 <code>$(DST_DIR)/hello.o</code>。<code>LIBS</code> 变量包含 <code>am</code> 和 <code>klib</code>。<code>LINKAGE</code> 初始为 <code>$(OBJS)</code>。</li>
+</ul>
+</li>
+<li><strong>导入架构特定配置</strong>：通过 <code>-include $(AM_HOME)/scripts/$(ARCH).mk</code> 导入特定于 <code>$ISA-nemu</code> 的配置，例如编译器、链接脚本 (<code>LDSCRIPTS</code>) 和额外的编译/链接标志。</li>
+</ol>
+<h5 id="依赖递归与展开"><strong>依赖递归与展开</strong></h5>
+<ol>
+<li><strong>链接依赖的展开</strong>：由于目标是 <code>image</code>，<code>Makefile</code> 不会执行 <code>archive</code> 目标。
+<ul>
+<li><code>LIB_TEMPLATE</code> 宏会为每个库 (<code>am</code>, <code>klib</code>) 生成一个依赖规则，目标是库的归档文件 (如 <code>$(AM_HOME)/am/build/am-$ARCH.a</code>)。</li>
+<li>这些库的归档文件被添加到 <code>LINKAGE</code> 中。</li>
+<li><strong>递归调用</strong>：当需要构建这些库归档文件时，<code>make</code> 会递归调用自身，进入库的目录 (<code>$(AM_HOME)/am</code> 或 <code>$(AM_HOME)/klib</code>)，并以 <code>archive</code> 为目标执行 <code>make</code> (<code>@$(MAKE) -s -C $(AM_HOME)/$(1) archive</code>)。</li>
+</ul>
+</li>
+<li><strong>构建顺序</strong>：<code>image</code> -&gt; <code>image-dep</code> -&gt; <strong><code>$(IMAGE).elf</code></strong>。</li>
+</ol>
+<h4 id="2-c文件的编译链接过程">2. C文件的编译链接过程</h4>
+<p>生成 <code>am-kernels/kernels/hello/build/hello-$ISA-nemu.elf</code> 文件主要经过以下三个阶段：</p>
+<h5 id="1-编译">1. 编译</h5>
+<ul>
+<li><strong>目标</strong>：将源代码文件 <code>hello.c</code> 编译成目标文件 <code>$(DST_DIR)/hello.o</code> (即 <code>am-kernels/kernels/hello/build/$ISA-nemu/hello.o</code>)。</li>
+<li><strong>规则</strong>：使用通用 Makefile 中重写的编译规则：
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-makefile" data-lang="makefile"><span class="line"><span class="cl"><span class="nf">$(DST_DIR)/%.o</span><span class="o">:</span> %.<span class="n">c</span>
+</span></span><span class="line"><span class="cl">    @mkdir -p <span class="k">$(</span>dir <span class="nv">$@</span><span class="k">)</span> <span class="o">&amp;&amp;</span> <span class="nb">echo</span> + CC $&lt;
+</span></span><span class="line"><span class="cl">    @<span class="k">$(</span>CC<span class="k">)</span> -std<span class="o">=</span>gnu11 <span class="k">$(</span>CFLAGS<span class="k">)</span> -c -o <span class="nv">$@</span> <span class="k">$(</span>realpath $&lt;<span class="k">)</span>
+</span></span></code></pre></div></li>
+<li><strong>执行命令</strong>：<code>make</code> 会执行类似如下的命令：
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">gcc -std<span class="o">=</span>gnu11 -O2 -MMD -Wall -Werror <span class="o">[</span>各种 -I&lt;path&gt; 头文件路径<span class="o">]</span> <span class="o">[</span>各种 -D&lt;macro&gt; 宏定义<span class="o">]</span> -fno-builtin ... -c -o build/<span class="nv">$ISA</span>-nemu/hello.o hello.c
+</span></span></code></pre></div><ul>
+<li><strong><code>$(CC)</code></strong>：使用交叉编译器（例如 <code>mips64-linux-gnu-gcc</code> 或 <code>riscv64-unknown-elf-gcc</code>，取决于 <code>ARCH</code>）。</li>
+<li><strong><code>$(CFLAGS)</code></strong>：包含了优化选项 (<code>-O2</code>)、警告/错误选项 (<code>-Wall -Werror</code>)、头文件路径 (<code>-I</code>) 和重要的宏定义 (<code>-D__ISA__</code> 等)；此外还有嵌入式/裸机编程常用的选项 (<code>-fno-builtin</code>, <code>-fno-stack-protector</code>)。</li>
+<li><strong><code>-MMD</code></strong>：该选项指示编译器生成一个 <code>.d</code> 文件 (<code>build/$ISA-nemu/hello.d</code>)，其中包含目标文件 <code>hello.o</code> 对所有依赖头文件的信息。这个 <code>.d</code> 文件会被 <code>-include</code> 导入到 Makefile 中，从而实现头文件修改时，<code>.o</code> 文件也能被正确地重新编译。</li>
+</ul>
+</li>
+</ul>
+<h5 id="2-归档">2. 归档</h5>
+<ul>
+<li><strong>目标</strong>：将 AbstractMachine 内核和库（<code>am</code> 和 <code>klib</code>）的源代码编译生成各自的静态库文件 (e.g., <code>$(AM_HOME)/am/build/am-$ARCH.a</code>)。</li>
+<li><strong>规则</strong>：通过递归调用 <code>make archive</code> 在各个库的目录下完成。</li>
+</ul>
+<h5 id="3-链接">3. 链接</h5>
+<ul>
+<li><strong>目标</strong>：将所有目标文件 (<code>hello.o</code>) 和所有依赖的库文件 (<code>am-$ARCH.a</code>, <code>klib-$ARCH.a</code>) 链接起来，生成最终的 ELF 可执行文件 <code>$(IMAGE).elf</code>。</li>
+<li><strong>规则</strong>：使用链接规则：
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-makefile" data-lang="makefile"><span class="line"><span class="cl"><span class="nf">$(IMAGE).elf</span><span class="o">:</span> <span class="k">$(</span><span class="nv">LINKAGE</span><span class="k">)</span> <span class="k">$(</span><span class="nv">LDSCRIPTS</span><span class="k">)</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># ...</span>
+</span></span><span class="line"><span class="cl">    @<span class="k">$(</span>LD<span class="k">)</span> <span class="k">$(</span>LDFLAGS<span class="k">)</span> -o <span class="nv">$@</span> --start-group <span class="k">$(</span>LINKAGE<span class="k">)</span> --end-group
+</span></span></code></pre></div></li>
+<li><strong>执行命令</strong>：<code>make</code> 会执行类似如下的命令：
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">ld -z noexecstack -T &lt;link_script&gt; -o build/hello-<span class="nv">$ISA</span>-nemu.elf --start-group <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    build/<span class="nv">$ISA</span>-nemu/hello.o <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    /path/to/am/build/am-<span class="nv">$ISA</span>-nemu.a <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    /path/to/klib/build/klib-<span class="nv">$ISA</span>-nemu.a <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --end-group
+</span></span></code></pre></div><ul>
+<li><strong><code>$(LD)</code></strong>：使用交叉链接器。</li>
+<li><strong><code>$(LDFLAGS)</code></strong>：包含 <code>LDSCRIPTS</code> 变量指定的链接脚本 (<code>-T</code>)。它定义了代码段、数据段在内存中的布局、入口点等信息。</li>
+<li><strong><code>$(LINKAGE)</code></strong>：包含所有 <code>.o</code> 文件和 <code>.a</code> 库文件。</li>
+<li><strong><code>--start-group ... --end-group</code></strong>：确保库文件之间如果存在相互依赖，链接器也能正确解析所有符号。</li>
+</ul>
+</li>
+</ul>
+<p>至此，<code>am-kernels/kernels/hello/build/hello-$ISA-nemu.elf</code> 可执行文件生成完成。</p>
+<hr>
+<h2 id="思考题">思考题</h2>
+<p><img src="Problem1.png" alt="Problem">
+RISC-V 提供了专门的指令来高效地加载 32 位常数：</p>
+<ul>
+<li>LUI (Load Upper Immediate): 加载高 20 位立即数。</li>
+<li>ADDI (Add Immediate): 加载低 12 位立即数（并进行符号扩展）。</li>
+</ul>
+<p><img src="Problem2.png" alt="Problem2">
+测试返回：
+<img src="Answer_of_Problem2.png" alt="Answer"></p>
+<hr>
+<h2 id="有趣的瞬间">有趣的瞬间</h2>
+<p><img src="bad_apple.png" alt="bad apple"></p>
+<hr>
+<p><img src="cmatrix_1.png" alt="cmatrix 1"></p>
+<hr>
+<p><img src="cmatrix_2.png" alt="cmatrix 2"></p>
+<hr>
+<p><img src="cpu-tests.png" alt="cpu tests"></p>
+<hr>
+<p><img src="riscv32-nemu_benchmarks.png" alt="riscv32"></p>
+<hr>
+<p><img src="native_benchmarks.png" alt="native"></p>
+<hr>
+<p><img src="display-test.png" alt="display test"></p>
+<hr>
+<p><img src="mario.png" alt="mario"></p>
+<hr>
+<h2 id="实验心情">实验心情</h2>
+<p>😊 感觉良好</p>
+
+      </div>
+    </div>
+    
+    
+      <footer class="post-footer">
+        <div class="post-tags">
+          
+            <a href="/tags/ics/" class="tag-link">#ICS</a>
+          
+            <a href="/tags/pa/" class="tag-link">#PA</a>
+          
+        </div>
+      </footer>
+    
+  </div>
+</article>
+
+      </section>
+    </div>
+  </main>
+  
+  <footer class="footer" data-liquid-glass="footer">
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-info">
+        <p class="copyright">
+          © 2025 - 2026 OCTOPUS
+        </p>
+        <p class="powered">
+          Powered by <a href="https://gohugo.io" target="_blank">Hugo</a> & Designed By Myself
+        </p>
+      </div>
+      
+    </div>
+  </div>
+</footer>
+
+  
+  
+  <button class="fab-sidebar-toggle" id="fabSidebarToggle" aria-label="打开侧边栏">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <line x1="3" y1="12" x2="21" y2="12"/>
+      <line x1="3" y1="6" x2="21" y2="6"/>
+      <line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  </button>
+  
+  
+  <div class="sidebar-drawer" id="sidebarDrawer">
+    <div class="sidebar-drawer-header">
+      <span class="sidebar-drawer-title">导航</span>
+      <button class="sidebar-drawer-close" id="sidebarDrawerClose" aria-label="关闭">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="sidebar-drawer-content">
+      <div class="sidebar-inner">
+  
+  <div class="sidebar-card blog-title-card">
+    <a href="/" class="blog-title-link">
+      <span class="blog-title-text">DIMS</span>
+    </a>
+  </div>
+
+  <div class="sidebar-card profile-card">
+    <div class="avatar">
+      <img src="https://avatars.githubusercontent.com/u/204014295?v=4" alt="OCTOPUS">
+    </div>
+    <div class="profile-info">
+      <h3>OCTOPUS</h3>
+      <p>热爱技术，热爱生活。</p>
+    </div>
+    <div class="profile-meta">
+      <span>Since 2025</span>
+      
+        <span>github</span>
+      
+    </div>
+  </div>
+
+  
+  <div class="sidebar-card">
+    <h4 class="sidebar-title">
+      <a href="/categories/" class="sidebar-title-link">
+        <span class="title-icon">📁</span>
+        <span>分类</span>
+      </a>
+    </h4>
+    <ul class="sidebar-list">
+      
+      <li>
+        <a href="/categories/%E6%8A%A5%E5%91%8A/" class="sidebar-link">
+          <span class="link-name">报告</span>
+          <span class="count">4</span>
+        </a>
+      </li>
+      
+    </ul>
+  </div>
+  
+
+  
+  <div class="sidebar-card">
+    <h4 class="sidebar-title">
+      <a href="/tags/" class="sidebar-title-link">
+        <span class="title-icon">🏷️</span>
+        <span>标签</span>
+      </a>
+    </h4>
+    <div class="tag-cloud-compact">
+      
+        <a href="/tags/ics/" class="tag-item-compact" title="4 篇文章">
+          ICS
+        </a>
+      
+        <a href="/tags/pa/" class="tag-item-compact" title="4 篇文章">
+          PA
+        </a>
+      
+    </div>
+  </div>
+  
+
+  
+  <div class="sidebar-card">
+    <h4 class="sidebar-title">
+      <span class="title-icon">📝</span>
+      <span>最近文章</span>
+    </h4>
+    <ul class="sidebar-list recent-posts">
+      
+      <li>
+        <a href="/2026/02/09/ics_pa4-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/" class="sidebar-link recent-post-link">
+          <span class="link-name recent-post-title">ICS_PA4 实验报告</span>
+          <span class="date">02-09</span>
+        </a>
+      </li>
+      
+      <li>
+        <a href="/2025/12/12/ics_pa3-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/" class="sidebar-link recent-post-link">
+          <span class="link-name recent-post-title">ICS_PA3 实验报告</span>
+          <span class="date">12-12</span>
+        </a>
+      </li>
+      
+      <li>
+        <a href="/2025/11/11/ics_pa2-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/" class="sidebar-link recent-post-link">
+          <span class="link-name recent-post-title">ICS_PA2 实验报告</span>
+          <span class="date">11-11</span>
+        </a>
+      </li>
+      
+      <li>
+        <a href="/2025/09/24/ics_pa1-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/" class="sidebar-link recent-post-link">
+          <span class="link-name recent-post-title">ICS_PA1 实验报告</span>
+          <span class="date">09-24</span>
+        </a>
+      </li>
+      
+    </ul>
+  </div>
+  
+</div>
+
+    </div>
+  </div>
+  
+  
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  
+  
+  
+  <script src="/js/snow-ground.min.js"></script>
+  
+  <script src="/js/liquidGlass.min.js"></script>
+  
+  <script src="/js/main.min.js"></script>
+  
+  
+    
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        if (typeof renderMathInElement !== 'undefined') {
+          renderMathInElement(document.body, {
+            delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\[', right: '\\]', display: true},
+              {left: '\\(', right: '\\)', display: false}
+            ],
+            throwOnError: false
+          });
+        }
+      });
+    </script>
+  
+</body>
+</html>
