@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>日志 on DIMS</title>
+    <link>http://localhost:1313/moments/</link>
+    <description>Recent content in 日志 on DIMS</description>
+    <generator>Hugo</generator>
+    <language>zh-CN</language>
+    <lastBuildDate>Sun, 23 Feb 2025 14:30:00 +0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/moments/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title></title>
+      <link>http://localhost:1313/moments/2025-02-23-music/</link>
+      <pubDate>Sun, 23 Feb 2025 14:30:00 +0800</pubDate>
+      <guid>http://localhost:1313/moments/2025-02-23-music/</guid>
+      <description>&lt;p&gt;今晚的编程伴侣 (♪◡♪)&lt;/p&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;一群嗜血的蚂蚁 被腐肉所吸引&#xA;我面无表情 看孤独的风景&lt;/p&gt;&lt;/blockquote&gt;&#xA;&lt;p&gt;写代码的时候听这首，感觉整个人都进入状态了。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title></title>
+      <link>http://localhost:1313/moments/2025-02-20-thoughts/</link>
+      <pubDate>Thu, 20 Feb 2025 09:15:00 +0800</pubDate>
+      <guid>http://localhost:1313/moments/2025-02-20-thoughts/</guid>
+      <description>&lt;p&gt;早晨的阳光正好，泡了一杯咖啡，开始新的一天。&lt;/p&gt;&#xA;&lt;p&gt;最近在学习一些新的技术，感觉收获颇丰。保持好奇心，保持学习的热情 (｡♥‿♥｡)&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title></title>
+      <link>http://localhost:1313/moments/2025-02-18-quote/</link>
+      <pubDate>Tue, 18 Feb 2025 21:45:00 +0800</pubDate>
+      <guid>http://localhost:1313/moments/2025-02-18-quote/</guid>
+      <description>&lt;blockquote&gt;&#xA;&lt;p&gt;&amp;ldquo;Talk is cheap. Show me the code.&amp;rdquo;&lt;/p&gt;&#xA;&lt;p&gt;—— Linus Torvalds&lt;/p&gt;&lt;/blockquote&gt;&#xA;&lt;p&gt;简单的真理，却是永恒的启示。&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

@@ -37,6 +37,27 @@
       <description>&lt;h2 id=&#34;实验进度&#34;&gt;实验进度&lt;/h2&gt;&#xA;&lt;p&gt;我已完成 PA1 的&lt;strong&gt;所有内容&lt;/strong&gt;，并通过了&lt;strong&gt;所有的测试样例&lt;/strong&gt;。&lt;/p&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;必答题&#34;&gt;必答题&lt;/h2&gt;&#xA;&lt;h3 id=&#34;程序是个状态机&#34;&gt;程序是个状态机&lt;/h3&gt;&#xA;&lt;p&gt;&lt;strong&gt;问题：&lt;/strong&gt; 画出计算 1+2+&amp;hellip;+100 的程序的状态机。&lt;/p&gt;&#xA;&lt;p&gt;&lt;strong&gt;Solution:&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;// PC: instruction   | // label: statement&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;0: mov r1, 0         | pc0: r1 = 0;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;1: mov r2, 0         | pc1: r2 = 0;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;2: addi r2, r2 , 1   | pc2: r2 = r2 + 1;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;3: add r1, r1 , r2   | pc3: r1 = r1 + r2;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;4: cmp r2 100        | pc4: compare r2 with 100;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;5: jl 2              | pc5: if r2 &amp;lt; 100, jump to pc2&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;程序的状态机如下：&lt;/p&gt;</description>
     </item>
     <item>
+      <title></title>
+      <link>http://localhost:1313/moments/2025-02-23-music/</link>
+      <pubDate>Sun, 23 Feb 2025 14:30:00 +0800</pubDate>
+      <guid>http://localhost:1313/moments/2025-02-23-music/</guid>
+      <description>&lt;p&gt;今晚的编程伴侣 (♪◡♪)&lt;/p&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;一群嗜血的蚂蚁 被腐肉所吸引&#xA;我面无表情 看孤独的风景&lt;/p&gt;&lt;/blockquote&gt;&#xA;&lt;p&gt;写代码的时候听这首，感觉整个人都进入状态了。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title></title>
+      <link>http://localhost:1313/moments/2025-02-20-thoughts/</link>
+      <pubDate>Thu, 20 Feb 2025 09:15:00 +0800</pubDate>
+      <guid>http://localhost:1313/moments/2025-02-20-thoughts/</guid>
+      <description>&lt;p&gt;早晨的阳光正好，泡了一杯咖啡，开始新的一天。&lt;/p&gt;&#xA;&lt;p&gt;最近在学习一些新的技术，感觉收获颇丰。保持好奇心，保持学习的热情 (｡♥‿♥｡)&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title></title>
+      <link>http://localhost:1313/moments/2025-02-18-quote/</link>
+      <pubDate>Tue, 18 Feb 2025 21:45:00 +0800</pubDate>
+      <guid>http://localhost:1313/moments/2025-02-18-quote/</guid>
+      <description>&lt;blockquote&gt;&#xA;&lt;p&gt;&amp;ldquo;Talk is cheap. Show me the code.&amp;rdquo;&lt;/p&gt;&#xA;&lt;p&gt;—— Linus Torvalds&lt;/p&gt;&lt;/blockquote&gt;&#xA;&lt;p&gt;简单的真理，却是永恒的启示。&lt;/p&gt;</description>
+    </item>
+    <item>
       <title>About</title>
       <link>http://localhost:1313/about/</link>
       <pubDate>Wed, 01 Jan 2025 00:00:00 +0800</pubDate>
