@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>ICS on DIMS</title><link>https://example.com/tags/ics/</link><description>Recent content in ICS on DIMS</description><generator>Hugo</generator><language>zh-CN</language><lastBuildDate>Mon, 09 Feb 2026 22:45:00 +0000</lastBuildDate><atom:link href="https://example.com/tags/ics/index.xml" rel="self" type="application/rss+xml"/><item><title>ICS_PA4 实验报告</title><link>https://example.com/2026/02/09/ics_pa4-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/</link><pubDate>Mon, 09 Feb 2026 22:45:00 +0000</pubDate><guid>https://example.com/2026/02/09/ics_pa4-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/</guid><description>&lt;h2 id="实验进度">实验进度&lt;/h2>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>ICS on DIMS</title><link>https://octopusdims.github.io/tags/ics/</link><description>Recent content in ICS on DIMS</description><generator>Hugo</generator><language>zh-CN</language><lastBuildDate>Mon, 09 Feb 2026 22:45:00 +0000</lastBuildDate><atom:link href="https://octopusdims.github.io/tags/ics/index.xml" rel="self" type="application/rss+xml"/><item><title>ICS_PA4 实验报告</title><link>https://octopusdims.github.io/2026/02/09/ics_pa4-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/</link><pubDate>Mon, 09 Feb 2026 22:45:00 +0000</pubDate><guid>https://octopusdims.github.io/2026/02/09/ics_pa4-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/</guid><description>&lt;h2 id="实验进度">实验进度&lt;/h2>
 &lt;p>我已完成 PA4 的&lt;strong>所有必做内容&lt;/strong>（虚实交错的魔法、分时多任务），成功实现了分页机制、进程上下文切换，并能够让&lt;strong>仙剑奇侠传&lt;/strong>和 &lt;strong>Hello&lt;/strong> 程序同时在 Nanos-lite 上分时运行。&lt;/p>
 &lt;hr>
 &lt;h2 id="必答题">必答题&lt;/h2>
@@ -25,7 +25,7 @@
 &lt;li>&lt;strong>硬件响应：&lt;/strong> 硬件检测到中断，保存当前 PC 到 &lt;code>mepc&lt;/code>，设置 &lt;code>mcause&lt;/code>，并跳转到 &lt;code>__am_asm_trap&lt;/code>（位于 &lt;code>am/src/riscv/nemu/trap.S:44&lt;/code>）。&lt;/li>
 &lt;/ul>
 &lt;h4 id="保存现场-context-saving">保存现场 (Context Saving)&lt;/h4>
-&lt;p>&lt;code>trap.S&lt;/code>（&lt;code>am/src/riscv/nemu/trap.S:44-94&lt;/code>）将仙剑奇侠传当前的通用寄存器、CSR 寄存器（包括 &lt;code>mstatus&lt;/code>, &lt;code>mepc&lt;/code> 等）压入当前进程的内核栈中，形成一个 &lt;code>Context&lt;/code> 结构体。&lt;/p></description></item><item><title>ICS_PA3 实验报告</title><link>https://example.com/2025/12/12/ics_pa3-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/</link><pubDate>Fri, 12 Dec 2025 13:16:23 +0000</pubDate><guid>https://example.com/2025/12/12/ics_pa3-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/</guid><description>&lt;h2 id="实验进度">实验进度&lt;/h2>
+&lt;p>&lt;code>trap.S&lt;/code>（&lt;code>am/src/riscv/nemu/trap.S:44-94&lt;/code>）将仙剑奇侠传当前的通用寄存器、CSR 寄存器（包括 &lt;code>mstatus&lt;/code>, &lt;code>mepc&lt;/code> 等）压入当前进程的内核栈中，形成一个 &lt;code>Context&lt;/code> 结构体。&lt;/p></description></item><item><title>ICS_PA3 实验报告</title><link>https://octopusdims.github.io/2025/12/12/ics_pa3-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/</link><pubDate>Fri, 12 Dec 2025 13:16:23 +0000</pubDate><guid>https://octopusdims.github.io/2025/12/12/ics_pa3-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/</guid><description>&lt;h2 id="实验进度">实验进度&lt;/h2>
 &lt;p>我已完成 PA3 的&lt;strong>所有内容&lt;/strong>，并通过了&lt;strong>所有的测试样例&lt;/strong>。&lt;/p>
 &lt;hr>
 &lt;h2 id="必答题">必答题&lt;/h2>
@@ -56,7 +56,7 @@
 &lt;li>&lt;strong>关键点：&lt;/strong> 这是保存现场的第一步，占用 $Context$ 结构体中最大的连续内存块。&lt;/li>
 &lt;/ul>
 &lt;h5 id="22-特权系统寄存器-mcause-mstatus-mepc">2.2. 特权/系统寄存器 (&lt;code>mcause&lt;/code>, &lt;code>mstatus&lt;/code>, &lt;code>mepc&lt;/code>)&lt;/h5>
-&lt;p>这三个寄存器是 RISC-V 异常处理的核心，它们由硬件和软件协同赋值：&lt;/p></description></item><item><title>ICS_PA2 实验报告</title><link>https://example.com/2025/11/11/ics_pa2-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/</link><pubDate>Tue, 11 Nov 2025 14:58:52 +0000</pubDate><guid>https://example.com/2025/11/11/ics_pa2-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/</guid><description>&lt;h2 id="实验进度">实验进度&lt;/h2>
+&lt;p>这三个寄存器是 RISC-V 异常处理的核心，它们由硬件和软件协同赋值：&lt;/p></description></item><item><title>ICS_PA2 实验报告</title><link>https://octopusdims.github.io/2025/11/11/ics_pa2-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/</link><pubDate>Tue, 11 Nov 2025 14:58:52 +0000</pubDate><guid>https://octopusdims.github.io/2025/11/11/ics_pa2-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/</guid><description>&lt;h2 id="实验进度">实验进度&lt;/h2>
 &lt;p>我已完成 PA2 的&lt;strong>所有内容&lt;/strong>，并通过了&lt;strong>所有的测试样例&lt;/strong>。&lt;/p>
 &lt;hr>
 &lt;h2 id="必答题">必答题&lt;/h2>
@@ -118,7 +118,7 @@
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;The result of 16 + 33 is %d&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">M&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">7&lt;/span>&lt;span class="p">]);&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;strong>问题：&lt;/strong> 画出在YEMU上执行的加法程序的状态机&lt;/p></description></item><item><title>ICS_PA1 实验报告</title><link>https://example.com/2025/09/24/ics_pa1-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/</link><pubDate>Wed, 24 Sep 2025 19:04:44 +0000</pubDate><guid>https://example.com/2025/09/24/ics_pa1-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/</guid><description>&lt;h2 id="实验进度">实验进度&lt;/h2>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;strong>问题：&lt;/strong> 画出在YEMU上执行的加法程序的状态机&lt;/p></description></item><item><title>ICS_PA1 实验报告</title><link>https://octopusdims.github.io/2025/09/24/ics_pa1-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/</link><pubDate>Wed, 24 Sep 2025 19:04:44 +0000</pubDate><guid>https://octopusdims.github.io/2025/09/24/ics_pa1-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/</guid><description>&lt;h2 id="实验进度">实验进度&lt;/h2>
 &lt;p>我已完成 PA1 的&lt;strong>所有内容&lt;/strong>，并通过了&lt;strong>所有的测试样例&lt;/strong>。&lt;/p>
 &lt;hr>
 &lt;h2 id="必答题">必答题&lt;/h2>
