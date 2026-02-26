@@ -1,135 +1,135 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on DIMS</title><link>https://octopusdims.github.io/posts/</link><description>Recent content in Posts on DIMS</description><generator>Hugo</generator><language>zh-CN</language><lastBuildDate>Mon, 09 Feb 2026 22:45:00 +0000</lastBuildDate><atom:link href="https://octopusdims.github.io/posts/index.xml" rel="self" type="application/rss+xml"/><item><title>ICS_PA4 实验报告</title><link>https://octopusdims.github.io/2026/02/09/ics_pa4-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/</link><pubDate>Mon, 09 Feb 2026 22:45:00 +0000</pubDate><guid>https://octopusdims.github.io/2026/02/09/ics_pa4-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/</guid><description>&lt;h2 id="实验进度">实验进度&lt;/h2>
-&lt;p>我已完成 PA4 的&lt;strong>所有必做内容&lt;/strong>（虚实交错的魔法、分时多任务），成功实现了分页机制、进程上下文切换，并能够让&lt;strong>仙剑奇侠传&lt;/strong>和 &lt;strong>Hello&lt;/strong> 程序同时在 Nanos-lite 上分时运行。&lt;/p>
-&lt;hr>
-&lt;h2 id="必答题">必答题&lt;/h2>
-&lt;h3 id="分时多任务的具体过程">分时多任务的具体过程&lt;/h3>
-&lt;p>&lt;strong>问题：&lt;/strong> 请结合代码, 解释分页机制和硬件中断是如何支撑仙剑奇侠传和hello程序在我们的计算机系统(Nanos-lite, AM, NEMU)中分时运行的。&lt;/p>
-&lt;p>&lt;strong>Solution:&lt;/strong>&lt;/p>
-&lt;p>这一过程是&lt;strong>时钟中断驱动&lt;/strong>与&lt;strong>虚拟内存隔离&lt;/strong>共同作用的结果。我们可以将其拆解为以下几个关键步骤：&lt;/p>
-&lt;h4 id="初始准备与加载">初始准备与加载&lt;/h4>
-&lt;p>在 &lt;code>init_proc()&lt;/code> 中（&lt;code>nanos-lite/src/proc.c:34-60&lt;/code>），Nanos-lite 加载了仙剑奇侠传、Hello、Menu 和 Nterm 四个程序。&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// pcb[0]: hello 
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="nf">context_kload&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">pcb&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="n">hello_fun&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;hello&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// pcb[1]: 仙剑奇侠传 (PAL)
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kt">char&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">argv_pal&lt;/span>&lt;span class="p">[]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="s">&amp;#34;/bin/pal&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;--skip&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">};&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">char&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">envp_pal&lt;/span>&lt;span class="p">[]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="s">&amp;#34;PATH=/bin&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">};&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nf">context_uload&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">pcb&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="s">&amp;#34;/bin/pal&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">argv_pal&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">envp_pal&lt;/span>&lt;span class="p">);&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;ul>
-&lt;li>&lt;strong>虚拟地址空间创建：&lt;/strong> &lt;code>context_uload&lt;/code> 调用 &lt;code>protect()&lt;/code>（&lt;code>am/src/riscv/nemu/vme.c:47-54&lt;/code>），为每个进程分配独立的页目录表（Page Directory）并复制内核页表映射。&lt;/li>
-&lt;li>&lt;strong>代码加载：&lt;/strong> Loader（&lt;code>nanos-lite/src/loader.c:49-100&lt;/code>）将 ELF 文件加载到各自虚拟地址空间。通过 &lt;code>map()&lt;/code> 函数建立虚拟地址到物理页帧的映射，确保不同进程的虚拟地址映射到不同的物理内存页。&lt;/li>
-&lt;/ul>
-&lt;h4 id="中断触发-the-trigger">中断触发 (The Trigger)&lt;/h4>
-&lt;p>当仙剑奇侠传正在 CPU 上运行时，NEMU 的时钟设备定期产生中断信号（&lt;code>mcause = 0x80000007&lt;/code>）。&lt;/p>
-&lt;ul>
-&lt;li>&lt;strong>硬件响应：&lt;/strong> 硬件检测到中断，保存当前 PC 到 &lt;code>mepc&lt;/code>，设置 &lt;code>mcause&lt;/code>，并跳转到 &lt;code>__am_asm_trap&lt;/code>（位于 &lt;code>am/src/riscv/nemu/trap.S:44&lt;/code>）。&lt;/li>
-&lt;/ul>
-&lt;h4 id="保存现场-context-saving">保存现场 (Context Saving)&lt;/h4>
-&lt;p>&lt;code>trap.S&lt;/code>（&lt;code>am/src/riscv/nemu/trap.S:44-94&lt;/code>）将仙剑奇侠传当前的通用寄存器、CSR 寄存器（包括 &lt;code>mstatus&lt;/code>, &lt;code>mepc&lt;/code> 等）压入当前进程的内核栈中，形成一个 &lt;code>Context&lt;/code> 结构体。&lt;/p></description></item><item><title>ICS_PA3 实验报告</title><link>https://octopusdims.github.io/2025/12/12/ics_pa3-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/</link><pubDate>Fri, 12 Dec 2025 13:16:23 +0000</pubDate><guid>https://octopusdims.github.io/2025/12/12/ics_pa3-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/</guid><description>&lt;h2 id="实验进度">实验进度&lt;/h2>
-&lt;p>我已完成 PA3 的&lt;strong>所有内容&lt;/strong>，并通过了&lt;strong>所有的测试样例&lt;/strong>。&lt;/p>
-&lt;hr>
-&lt;h2 id="必答题">必答题&lt;/h2>
-&lt;h3 id="理解上下文结构体的前世今生">理解上下文结构体的前世今生&lt;/h3>
-&lt;p>&lt;strong>问题：&lt;/strong> 你会在&lt;code>__am_irq_handle()&lt;/code>中看到有一个上下文结构指针&lt;code>c&lt;/code>, &lt;code>c&lt;/code>指向的上下文结构究竟在哪里? 这个上下文结构又是怎么来的? 具体地, 这个上下文结构有很多成员, 每一个成员究竟在哪里赋值的? &lt;code>$ISA-nemu.h&lt;/code>, &lt;code>trap.S&lt;/code>, 上述讲义文字, 以及你刚刚在NEMU中实现的新指令, 这四部分内容又有什么联系?&lt;/p>
-&lt;p>&lt;strong>Solution:&lt;/strong>&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="k">struct&lt;/span> &lt;span class="n">Context&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// TODO: fix the order of these members to match trap.S
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kt">uintptr_t&lt;/span> &lt;span class="n">gpr&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">NR_REGS&lt;/span>&lt;span class="p">];&lt;/span> 
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">uintptr_t&lt;/span> &lt;span class="n">mcause&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">uintptr_t&lt;/span> &lt;span class="n">mstatus&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">uintptr_t&lt;/span> &lt;span class="n">mepc&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">void&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">pdir&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">};&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;hr>
-&lt;h4 id="上下文结构-c-的位置和来源">上下文结构 $c$ 的位置和来源&lt;/h4>
-&lt;ol>
-&lt;li>上下文结构 $c$ 指向的结构体实例保存在&lt;strong>当前线程的内核栈上&lt;/strong>。&lt;/li>
-&lt;li>它是由 NEMU 的中断/异常处理汇编入口文件 &lt;strong>&lt;code>trap.S&lt;/code>&lt;/strong> 在中断/异常发生时，通过一系列汇编指令（主要是压栈操作）在栈上动态创建的。&lt;/li>
-&lt;/ol>
-&lt;hr>
-&lt;h4 id="上下文结构成员的赋值位置">上下文结构成员的赋值位置&lt;/h4>
-&lt;p>所有成员的赋值都发生在 &lt;strong>&lt;code>trap.S&lt;/code>&lt;/strong> 文件中：&lt;/p>
-&lt;h5 id="21-通用寄存器-gprnr_regs">2.1. 通用寄存器 (&lt;code>gpr[NR_REGS]&lt;/code>)&lt;/h5>
-&lt;ul>
-&lt;li>&lt;strong>赋值位置：&lt;/strong> &lt;code>trap.S&lt;/code>。&lt;/li>
-&lt;li>&lt;strong>赋值方式：&lt;/strong> 通过一系列 &lt;code>sw&lt;/code> (store word) 或 &lt;code>sd&lt;/code> (store doubleword) 指令（取决于 $32/64$ 位），将通用寄存器 $x1$ 到 $x31$（$x0$ 寄存器为 $0$，通常不需保存或以 $0$ 占位）的值依次压入栈中。&lt;/li>
-&lt;li>&lt;strong>关键点：&lt;/strong> 这是保存现场的第一步，占用 $Context$ 结构体中最大的连续内存块。&lt;/li>
-&lt;/ul>
-&lt;h5 id="22-特权系统寄存器-mcause-mstatus-mepc">2.2. 特权/系统寄存器 (&lt;code>mcause&lt;/code>, &lt;code>mstatus&lt;/code>, &lt;code>mepc&lt;/code>)&lt;/h5>
-&lt;p>这三个寄存器是 RISC-V 异常处理的核心，它们由硬件和软件协同赋值：&lt;/p></description></item><item><title>ICS_PA2 实验报告</title><link>https://octopusdims.github.io/2025/11/11/ics_pa2-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/</link><pubDate>Tue, 11 Nov 2025 14:58:52 +0000</pubDate><guid>https://octopusdims.github.io/2025/11/11/ics_pa2-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/</guid><description>&lt;h2 id="实验进度">实验进度&lt;/h2>
-&lt;p>我已完成 PA2 的&lt;strong>所有内容&lt;/strong>，并通过了&lt;strong>所有的测试样例&lt;/strong>。&lt;/p>
-&lt;hr>
-&lt;h2 id="必答题">必答题&lt;/h2>
-&lt;h3 id="不停计算的机器">不停计算的机器&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-C" data-lang="C">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;stdint.h&amp;gt;&lt;/span>&lt;span class="cp">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;stdio.h&amp;gt;&lt;/span>&lt;span class="cp">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#define NREG 4
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#define NMEM 16
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 定义指令格式
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="k">typedef&lt;/span> &lt;span class="k">union&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">struct&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="kt">uint8_t&lt;/span> &lt;span class="nl">rs&lt;/span> &lt;span class="p">:&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nl">rt&lt;/span> &lt;span class="p">:&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nl">op&lt;/span> &lt;span class="p">:&lt;/span> &lt;span class="mi">4&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="n">rtype&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">struct&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="kt">uint8_t&lt;/span> &lt;span class="nl">addr&lt;/span> &lt;span class="p">:&lt;/span> &lt;span class="mi">4&lt;/span> &lt;span class="p">,&lt;/span> &lt;span class="nl">op&lt;/span> &lt;span class="p">:&lt;/span> &lt;span class="mi">4&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="n">mtype&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">uint8_t&lt;/span> &lt;span class="n">inst&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span> &lt;span class="kt">inst_t&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#define DECODE_R(inst) uint8_t rt = (inst).rtype.rt, rs = (inst).rtype.rs
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#define DECODE_M(inst) uint8_t addr = (inst).mtype.addr
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">uint8_t&lt;/span> &lt;span class="n">pc&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// PC, C语言中没有4位的数据类型, 我们采用8位类型来表示
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kt">uint8_t&lt;/span> &lt;span class="n">R&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">NREG&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{};&lt;/span> &lt;span class="c1">// 寄存器
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kt">uint8_t&lt;/span> &lt;span class="n">M&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">NMEM&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="c1">// 内存, 其中包含一个计算z = x + y的程序
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="n">b11100110&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1">// load 6# | R[0] &amp;lt;- M[y]
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="n">b00000100&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1">// mov r1, r0 | R[1] &amp;lt;- R[0]
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="n">b11100101&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1">// load 5# | R[0] &amp;lt;- M[x]
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="n">b00010001&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1">// add r0, r1 | R[0] &amp;lt;- R[0] + R[1]
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="n">b11110111&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1">// store 7# | M[z] &amp;lt;- R[0]
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="n">b00010000&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1">// x = 16
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="n">b00100001&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1">// y = 33
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="n">b00000000&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1">// z = 0
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">};&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="n">halt&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// 结束标志
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 执行一条指令
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kt">void&lt;/span> &lt;span class="nf">exec_once&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">inst_t&lt;/span> &lt;span class="n">this&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">inst&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">M&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">pc&lt;/span>&lt;span class="p">];&lt;/span> &lt;span class="c1">// 取指
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">switch&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">rtype&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">op&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 操作码译码 操作数译码 执行
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">case&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="nl">b0000&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nf">DECODE_R&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">this&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="n">R&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">rt&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">R&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">rs&lt;/span>&lt;span class="p">];&lt;/span> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">case&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="nl">b0001&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nf">DECODE_R&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">this&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="n">R&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">rt&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="n">R&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">rs&lt;/span>&lt;span class="p">];&lt;/span> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">case&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="nl">b1110&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nf">DECODE_M&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">this&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="n">R&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">M&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">addr&lt;/span>&lt;span class="p">];&lt;/span> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">case&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="nl">b1111&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nf">DECODE_M&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">this&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="n">M&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">addr&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">R&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">];&lt;/span> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">default&lt;/span>&lt;span class="o">:&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Invalid instruction with opcode = %x, halting...&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">rtype&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">op&lt;/span>&lt;span class="p">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">halt&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">pc&lt;/span> &lt;span class="o">++&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// 更新PC
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">while&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">exec_once&lt;/span>&lt;span class="p">();&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">halt&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;The result of 16 + 33 is %d&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">M&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">7&lt;/span>&lt;span class="p">]);&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;strong>问题：&lt;/strong> 画出在YEMU上执行的加法程序的状态机&lt;/p></description></item><item><title>ICS_PA1 实验报告</title><link>https://octopusdims.github.io/2025/09/24/ics_pa1-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/</link><pubDate>Wed, 24 Sep 2025 19:04:44 +0000</pubDate><guid>https://octopusdims.github.io/2025/09/24/ics_pa1-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/</guid><description>&lt;h2 id="实验进度">实验进度&lt;/h2>
-&lt;p>我已完成 PA1 的&lt;strong>所有内容&lt;/strong>，并通过了&lt;strong>所有的测试样例&lt;/strong>。&lt;/p>
-&lt;hr>
-&lt;h2 id="必答题">必答题&lt;/h2>
-&lt;h3 id="程序是个状态机">程序是个状态机&lt;/h3>
-&lt;p>&lt;strong>问题：&lt;/strong> 画出计算 1+2+&amp;hellip;+100 的程序的状态机。&lt;/p>
-&lt;p>&lt;strong>Solution:&lt;/strong>&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">// PC: instruction | // label: statement
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">0: mov r1, 0 | pc0: r1 = 0;
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">1: mov r2, 0 | pc1: r2 = 0;
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">2: addi r2, r2 , 1 | pc2: r2 = r2 + 1;
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">3: add r1, r1 , r2 | pc3: r1 = r1 + r2;
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">4: cmp r2 100 | pc4: compare r2 with 100;
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">5: jl 2 | pc5: if r2 &amp;lt; 100, jump to pc2
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>程序的状态机如下：&lt;/p></description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on DIMS</title><link>https://octopusdims.github.io/posts/</link><description>Recent content in Posts on DIMS</description><generator>Hugo</generator><language>zh-CN</language><lastBuildDate>Mon, 09 Feb 2026 22:45:00 +0000</lastBuildDate><atom:link href="https://octopusdims.github.io/posts/index.xml" rel="self" type="application/rss+xml"/><item><title>ICS_PA4 实验报告</title><link>https://octopusdims.github.io/2026/02/09/ics_pa4-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/</link><pubDate>Mon, 09 Feb 2026 22:45:00 +0000</pubDate><guid>https://octopusdims.github.io/2026/02/09/ics_pa4-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/</guid><description>&lt;h2 id="实验进度"&gt;实验进度&lt;/h2&gt;
+&lt;p&gt;我已完成 PA4 的&lt;strong&gt;所有必做内容&lt;/strong&gt;（虚实交错的魔法、分时多任务），成功实现了分页机制、进程上下文切换，并能够让&lt;strong&gt;仙剑奇侠传&lt;/strong&gt;和 &lt;strong&gt;Hello&lt;/strong&gt; 程序同时在 Nanos-lite 上分时运行。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="必答题"&gt;必答题&lt;/h2&gt;
+&lt;h3 id="分时多任务的具体过程"&gt;分时多任务的具体过程&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;问题：&lt;/strong&gt; 请结合代码, 解释分页机制和硬件中断是如何支撑仙剑奇侠传和hello程序在我们的计算机系统(Nanos-lite, AM, NEMU)中分时运行的。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Solution:&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;这一过程是&lt;strong&gt;时钟中断驱动&lt;/strong&gt;与&lt;strong&gt;虚拟内存隔离&lt;/strong&gt;共同作用的结果。我们可以将其拆解为以下几个关键步骤：&lt;/p&gt;
+&lt;h4 id="初始准备与加载"&gt;初始准备与加载&lt;/h4&gt;
+&lt;p&gt;在 &lt;code&gt;init_proc()&lt;/code&gt; 中（&lt;code&gt;nanos-lite/src/proc.c:34-60&lt;/code&gt;），Nanos-lite 加载了仙剑奇侠传、Hello、Menu 和 Nterm 四个程序。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-c" data-lang="c"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;// pcb[0]: hello 
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nf"&gt;context_kload&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;pcb&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="n"&gt;hello_fun&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#34;hello&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;// pcb[1]: 仙剑奇侠传 (PAL)
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;argv_pal&lt;/span&gt;&lt;span class="p"&gt;[]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;/bin/pal&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#34;--skip&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;envp_pal&lt;/span&gt;&lt;span class="p"&gt;[]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;PATH=/bin&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nf"&gt;context_uload&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;pcb&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="s"&gt;&amp;#34;/bin/pal&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;argv_pal&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;envp_pal&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;虚拟地址空间创建：&lt;/strong&gt; &lt;code&gt;context_uload&lt;/code&gt; 调用 &lt;code&gt;protect()&lt;/code&gt;（&lt;code&gt;am/src/riscv/nemu/vme.c:47-54&lt;/code&gt;），为每个进程分配独立的页目录表（Page Directory）并复制内核页表映射。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;代码加载：&lt;/strong&gt; Loader（&lt;code&gt;nanos-lite/src/loader.c:49-100&lt;/code&gt;）将 ELF 文件加载到各自虚拟地址空间。通过 &lt;code&gt;map()&lt;/code&gt; 函数建立虚拟地址到物理页帧的映射，确保不同进程的虚拟地址映射到不同的物理内存页。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="中断触发-the-trigger"&gt;中断触发 (The Trigger)&lt;/h4&gt;
+&lt;p&gt;当仙剑奇侠传正在 CPU 上运行时，NEMU 的时钟设备定期产生中断信号（&lt;code&gt;mcause = 0x80000007&lt;/code&gt;）。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;硬件响应：&lt;/strong&gt; 硬件检测到中断，保存当前 PC 到 &lt;code&gt;mepc&lt;/code&gt;，设置 &lt;code&gt;mcause&lt;/code&gt;，并跳转到 &lt;code&gt;__am_asm_trap&lt;/code&gt;（位于 &lt;code&gt;am/src/riscv/nemu/trap.S:44&lt;/code&gt;）。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="保存现场-context-saving"&gt;保存现场 (Context Saving)&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;trap.S&lt;/code&gt;（&lt;code&gt;am/src/riscv/nemu/trap.S:44-94&lt;/code&gt;）将仙剑奇侠传当前的通用寄存器、CSR 寄存器（包括 &lt;code&gt;mstatus&lt;/code&gt;, &lt;code&gt;mepc&lt;/code&gt; 等）压入当前进程的内核栈中，形成一个 &lt;code&gt;Context&lt;/code&gt; 结构体。&lt;/p&gt;</description></item><item><title>ICS_PA3 实验报告</title><link>https://octopusdims.github.io/2025/12/12/ics_pa3-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/</link><pubDate>Fri, 12 Dec 2025 13:16:23 +0000</pubDate><guid>https://octopusdims.github.io/2025/12/12/ics_pa3-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/</guid><description>&lt;h2 id="实验进度"&gt;实验进度&lt;/h2&gt;
+&lt;p&gt;我已完成 PA3 的&lt;strong&gt;所有内容&lt;/strong&gt;，并通过了&lt;strong&gt;所有的测试样例&lt;/strong&gt;。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="必答题"&gt;必答题&lt;/h2&gt;
+&lt;h3 id="理解上下文结构体的前世今生"&gt;理解上下文结构体的前世今生&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;问题：&lt;/strong&gt; 你会在&lt;code&gt;__am_irq_handle()&lt;/code&gt;中看到有一个上下文结构指针&lt;code&gt;c&lt;/code&gt;, &lt;code&gt;c&lt;/code&gt;指向的上下文结构究竟在哪里? 这个上下文结构又是怎么来的? 具体地, 这个上下文结构有很多成员, 每一个成员究竟在哪里赋值的? &lt;code&gt;$ISA-nemu.h&lt;/code&gt;, &lt;code&gt;trap.S&lt;/code&gt;, 上述讲义文字, 以及你刚刚在NEMU中实现的新指令, 这四部分内容又有什么联系?&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Solution:&lt;/strong&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-c" data-lang="c"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;Context&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="c1"&gt;// TODO: fix the order of these members to match trap.S
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="kt"&gt;uintptr_t&lt;/span&gt; &lt;span class="n"&gt;gpr&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;NR_REGS&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="kt"&gt;uintptr_t&lt;/span&gt; &lt;span class="n"&gt;mcause&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="kt"&gt;uintptr_t&lt;/span&gt; &lt;span class="n"&gt;mstatus&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="kt"&gt;uintptr_t&lt;/span&gt; &lt;span class="n"&gt;mepc&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;pdir&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;};&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h4 id="上下文结构-c-的位置和来源"&gt;上下文结构 $c$ 的位置和来源&lt;/h4&gt;
+&lt;ol&gt;
+&lt;li&gt;上下文结构 $c$ 指向的结构体实例保存在&lt;strong&gt;当前线程的内核栈上&lt;/strong&gt;。&lt;/li&gt;
+&lt;li&gt;它是由 NEMU 的中断/异常处理汇编入口文件 &lt;strong&gt;&lt;code&gt;trap.S&lt;/code&gt;&lt;/strong&gt; 在中断/异常发生时，通过一系列汇编指令（主要是压栈操作）在栈上动态创建的。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;hr&gt;
+&lt;h4 id="上下文结构成员的赋值位置"&gt;上下文结构成员的赋值位置&lt;/h4&gt;
+&lt;p&gt;所有成员的赋值都发生在 &lt;strong&gt;&lt;code&gt;trap.S&lt;/code&gt;&lt;/strong&gt; 文件中：&lt;/p&gt;
+&lt;h5 id="21-通用寄存器-gprnr_regs"&gt;2.1. 通用寄存器 (&lt;code&gt;gpr[NR_REGS]&lt;/code&gt;)&lt;/h5&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;赋值位置：&lt;/strong&gt; &lt;code&gt;trap.S&lt;/code&gt;。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;赋值方式：&lt;/strong&gt; 通过一系列 &lt;code&gt;sw&lt;/code&gt; (store word) 或 &lt;code&gt;sd&lt;/code&gt; (store doubleword) 指令（取决于 $32/64$ 位），将通用寄存器 $x1$ 到 $x31$（$x0$ 寄存器为 $0$，通常不需保存或以 $0$ 占位）的值依次压入栈中。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;关键点：&lt;/strong&gt; 这是保存现场的第一步，占用 $Context$ 结构体中最大的连续内存块。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h5 id="22-特权系统寄存器-mcause-mstatus-mepc"&gt;2.2. 特权/系统寄存器 (&lt;code&gt;mcause&lt;/code&gt;, &lt;code&gt;mstatus&lt;/code&gt;, &lt;code&gt;mepc&lt;/code&gt;)&lt;/h5&gt;
+&lt;p&gt;这三个寄存器是 RISC-V 异常处理的核心，它们由硬件和软件协同赋值：&lt;/p&gt;</description></item><item><title>ICS_PA2 实验报告</title><link>https://octopusdims.github.io/2025/11/11/ics_pa2-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/</link><pubDate>Tue, 11 Nov 2025 14:58:52 +0000</pubDate><guid>https://octopusdims.github.io/2025/11/11/ics_pa2-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/</guid><description>&lt;h2 id="实验进度"&gt;实验进度&lt;/h2&gt;
+&lt;p&gt;我已完成 PA2 的&lt;strong&gt;所有内容&lt;/strong&gt;，并通过了&lt;strong&gt;所有的测试样例&lt;/strong&gt;。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="必答题"&gt;必答题&lt;/h2&gt;
+&lt;h3 id="不停计算的机器"&gt;不停计算的机器&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-C" data-lang="C"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="cp"&gt;#include&lt;/span&gt; &lt;span class="cpf"&gt;&amp;lt;stdint.h&amp;gt;&lt;/span&gt;&lt;span class="cp"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="cp"&gt;#include&lt;/span&gt; &lt;span class="cpf"&gt;&amp;lt;stdio.h&amp;gt;&lt;/span&gt;&lt;span class="cp"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="cp"&gt;#define NREG 4
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="cp"&gt;#define NMEM 16
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;// 定义指令格式
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;typedef&lt;/span&gt; &lt;span class="k"&gt;union&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="kt"&gt;uint8_t&lt;/span&gt; &lt;span class="nl"&gt;rs&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nl"&gt;rt&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nl"&gt;op&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="n"&gt;rtype&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="kt"&gt;uint8_t&lt;/span&gt; &lt;span class="nl"&gt;addr&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;4&lt;/span&gt; &lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nl"&gt;op&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="n"&gt;mtype&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="kt"&gt;uint8_t&lt;/span&gt; &lt;span class="n"&gt;inst&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="kt"&gt;inst_t&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="cp"&gt;#define DECODE_R(inst) uint8_t rt = (inst).rtype.rt, rs = (inst).rtype.rs
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="cp"&gt;#define DECODE_M(inst) uint8_t addr = (inst).mtype.addr
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kt"&gt;uint8_t&lt;/span&gt; &lt;span class="n"&gt;pc&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c1"&gt;// PC, C语言中没有4位的数据类型, 我们采用8位类型来表示
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kt"&gt;uint8_t&lt;/span&gt; &lt;span class="n"&gt;R&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;NREG&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{};&lt;/span&gt; &lt;span class="c1"&gt;// 寄存器
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kt"&gt;uint8_t&lt;/span&gt; &lt;span class="n"&gt;M&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;NMEM&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="c1"&gt;// 内存, 其中包含一个计算z = x + y的程序
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="n"&gt;b11100110&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="c1"&gt;// load 6# | R[0] &amp;lt;- M[y]
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="n"&gt;b00000100&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="c1"&gt;// mov r1, r0 | R[1] &amp;lt;- R[0]
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="n"&gt;b11100101&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="c1"&gt;// load 5# | R[0] &amp;lt;- M[x]
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="n"&gt;b00010001&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="c1"&gt;// add r0, r1 | R[0] &amp;lt;- R[0] + R[1]
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="n"&gt;b11110111&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="c1"&gt;// store 7# | M[z] &amp;lt;- R[0]
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="n"&gt;b00010000&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="c1"&gt;// x = 16
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="n"&gt;b00100001&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="c1"&gt;// y = 33
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="n"&gt;b00000000&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="c1"&gt;// z = 0
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;};&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;halt&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c1"&gt;// 结束标志
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;// 执行一条指令
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;exec_once&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="kt"&gt;inst_t&lt;/span&gt; &lt;span class="n"&gt;this&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;inst&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;M&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;pc&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt; &lt;span class="c1"&gt;// 取指
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;switch&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;rtype&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;op&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="c1"&gt;// 操作码译码 操作数译码 执行
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="nl"&gt;b0000&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nf"&gt;DECODE_R&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;this&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt; &lt;span class="n"&gt;R&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;rt&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;R&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;rs&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt; &lt;span class="k"&gt;break&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="nl"&gt;b0001&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nf"&gt;DECODE_R&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;this&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt; &lt;span class="n"&gt;R&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;rt&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;R&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;rs&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt; &lt;span class="k"&gt;break&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="nl"&gt;b1110&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nf"&gt;DECODE_M&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;this&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt; &lt;span class="n"&gt;R&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;M&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;addr&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt; &lt;span class="k"&gt;break&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="nl"&gt;b1111&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nf"&gt;DECODE_M&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;this&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt; &lt;span class="n"&gt;M&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;addr&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;R&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt; &lt;span class="k"&gt;break&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;default&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nf"&gt;printf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;Invalid instruction with opcode = %x, halting...&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;rtype&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;op&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;halt&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;break&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;pc&lt;/span&gt; &lt;span class="o"&gt;++&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c1"&gt;// 更新PC
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nf"&gt;exec_once&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;halt&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;break&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nf"&gt;printf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;The result of 16 + 33 is %d&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;M&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;7&lt;/span&gt;&lt;span class="p"&gt;]);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;问题：&lt;/strong&gt; 画出在YEMU上执行的加法程序的状态机&lt;/p&gt;</description></item><item><title>ICS_PA1 实验报告</title><link>https://octopusdims.github.io/2025/09/24/ics_pa1-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/</link><pubDate>Wed, 24 Sep 2025 19:04:44 +0000</pubDate><guid>https://octopusdims.github.io/2025/09/24/ics_pa1-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/</guid><description>&lt;h2 id="实验进度"&gt;实验进度&lt;/h2&gt;
+&lt;p&gt;我已完成 PA1 的&lt;strong&gt;所有内容&lt;/strong&gt;，并通过了&lt;strong&gt;所有的测试样例&lt;/strong&gt;。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="必答题"&gt;必答题&lt;/h2&gt;
+&lt;h3 id="程序是个状态机"&gt;程序是个状态机&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;问题：&lt;/strong&gt; 画出计算 1+2+&amp;hellip;+100 的程序的状态机。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Solution:&lt;/strong&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;// PC: instruction | // label: statement
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;0: mov r1, 0 | pc0: r1 = 0;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;1: mov r2, 0 | pc1: r2 = 0;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;2: addi r2, r2 , 1 | pc2: r2 = r2 + 1;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;3: add r1, r1 , r2 | pc3: r1 = r1 + r2;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;4: cmp r2 100 | pc4: compare r2 with 100;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;5: jl 2 | pc5: if r2 &amp;lt; 100, jump to pc2
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;程序的状态机如下：&lt;/p&gt;</description></item></channel></rss>
