@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#17120f">
+  <title>DIMS Shader Lab</title>
+  <link rel="stylesheet" href="./shader-lab.css?v=4">
+</head>
+<body>
+  <canvas id="shaderCanvas" aria-hidden="true"></canvas>
+  <div class="noise" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+
+  <header class="lab-header">
+    <a class="brand" href="/" aria-label="返回博客首页">
+      <span>DIMS</span>
+      <i>◈</i>
+    </a>
+    <div class="lab-mark">
+      <span>SHADER LAB</span>
+      <span id="fps">-- FPS</span>
+    </div>
+  </header>
+
+  <main class="hero">
+    <div class="hero-copy">
+      <p class="eyebrow" id="eyebrow">I · LUMEN VELLUM</p>
+      <h1>DIMS</h1>
+      <span class="rule" aria-hidden="true"></span>
+      <p class="latin">Salve, viator.</p>
+      <p class="description" id="description">
+        流动的羊皮纸光泽与细金纹，适合作为当前首页的默认方向。
+      </p>
+    </div>
+  </main>
+
+  <section class="controls" aria-label="Shader controls">
+    <div class="presets" role="tablist" aria-label="Shader presets">
+      <button class="preset active" type="button" data-mode="0" role="tab" aria-selected="true">
+        <span>01</span>
+        <strong>Lumen Vellum</strong>
+      </button>
+      <button class="preset" type="button" data-mode="1" role="tab" aria-selected="false">
+        <span>02</span>
+        <strong>Gilded Veil</strong>
+      </button>
+      <button class="preset" type="button" data-mode="2" role="tab" aria-selected="false">
+        <span>03</span>
+        <strong>Verdant Mist</strong>
+      </button>
+      <button class="preset" type="button" data-mode="3" role="tab" aria-selected="false">
+        <span>04</span>
+        <strong>Arcane Eclipse</strong>
+      </button>
+    </div>
+
+    <div class="sliders">
+      <label>
+        <span>速度</span>
+        <input id="speed" type="range" min="0" max="2" value="0.72" step="0.01">
+        <output for="speed">0.72</output>
+      </label>
+      <label>
+        <span>强度</span>
+        <input id="intensity" type="range" min="0.2" max="1.8" value="1" step="0.01">
+        <output for="intensity">1.00</output>
+      </label>
+      <label>
+        <span>颗粒</span>
+        <input id="grain" type="range" min="0" max="1" value="0.22" step="0.01">
+        <output for="grain">0.22</output>
+      </label>
+      <button id="pause" class="pause" type="button" aria-pressed="false">暂停</button>
+    </div>
+
+    <p class="hint">移动指针扰动光场 · 数字键 1–4 切换 · Space 暂停</p>
+  </section>
+
+  <div id="errorPanel" class="error-panel" hidden>
+    <strong>WebGL shader 编译失败</strong>
+    <pre id="errorMessage"></pre>
+  </div>
+
+  <script src="./shader-lab.js?v=4"></script>
+</body>
+</html>

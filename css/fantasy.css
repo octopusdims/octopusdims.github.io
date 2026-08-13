@@ -252,6 +252,7 @@ html.home-page::-webkit-scrollbar {
   gap: 5px;
   background: none;
   border: none;
+  color: inherit;
   cursor: pointer;
   padding: 0.5rem;
 }
@@ -339,16 +340,27 @@ html.home-page::-webkit-scrollbar {
   display: block;
   width: 100% !important;
   height: 100% !important;
-  background: var(--charcoal);
+  background: transparent;
 }
 
 .hero-content {
   position: relative;
   z-index: 2;
+  isolation: isolate;
   text-align: center;
   color: var(--ivory);
   padding: 2rem;
   max-width: 800px;
+  transition: color 0.5s ease, text-shadow 0.5s ease;
+}
+
+.hero-content::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -4rem -7rem;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(15, 12, 10, 0.28), transparent 68%);
 }
 
 .hero-title {
@@ -365,8 +377,9 @@ html.home-page::-webkit-scrollbar {
   font-weight: 400;
   letter-spacing: 0.2em;
   line-height: 1;
-  color: var(--gold-dim);
-  text-shadow: 0 0 60px rgba(201, 169, 110, 0.3);
+  color: var(--ivory);
+  text-shadow: 0 0 60px rgba(201, 169, 110, 0.38);
+  transition: color 0.5s ease, text-shadow 0.5s ease;
 }
 
 .hero-title-divider {
@@ -384,16 +397,19 @@ html.home-page::-webkit-scrollbar {
   letter-spacing: 0.3em;
   color: var(--gold);
   opacity: 0.9;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.66);
 }
 
 .hero-description {
   font-family: var(--font-body);
   font-size: clamp(0.9rem, 1.5vw, 1.1rem);
   font-weight: 300;
-  color: var(--charcoal-muted);
+  color: rgba(245, 240, 232, 0.72);
   max-width: 480px;
   margin: 0 auto 3rem;
   line-height: 1.8;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.64);
+  transition: color 0.5s ease;
 }
 
 .hero-scroll-indicator {
@@ -439,7 +455,42 @@ html.home-page::-webkit-scrollbar {
   inset: 0;
   z-index: 2;
   pointer-events: none;
-  background: radial-gradient(ellipse at center, transparent 30%, rgba(26, 21, 18, 0.5) 100%);
+  background:
+    linear-gradient(180deg, rgba(15, 12, 10, 0.32), transparent 24%, transparent 72%, rgba(15, 12, 10, 0.3)),
+    radial-gradient(ellipse at center, transparent 34%, rgba(26, 21, 18, 0.38) 110%);
+  transition: background 0.5s ease;
+}
+
+/* Lumen Vellum is the only light shader. Keep the editorial hierarchy
+   readable when it is selected at random. */
+html[data-hero-shader-mode="0"] .site-header:not(.scrolled) {
+  color: var(--charcoal);
+}
+
+.hero-section[data-shader-mode="0"] .hero-content {
+  color: var(--charcoal);
+  text-shadow: 0 1px 18px rgba(255, 250, 241, 0.42);
+}
+
+.hero-section[data-shader-mode="0"] .hero-content::before {
+  background: radial-gradient(ellipse at center, rgba(255, 250, 241, 0.22), transparent 70%);
+}
+
+.hero-section[data-shader-mode="0"] .hero-title-main {
+  color: #2b241e;
+  text-shadow: 0 1px 24px rgba(255, 250, 241, 0.46);
+}
+
+.hero-section[data-shader-mode="0"] .hero-title-sub,
+.hero-section[data-shader-mode="0"] .hero-description {
+  color: rgba(42, 34, 28, 0.72);
+  text-shadow: 0 1px 14px rgba(255, 250, 241, 0.7);
+}
+
+.hero-section[data-shader-mode="0"] .hero-vignette {
+  background:
+    linear-gradient(180deg, rgba(54, 44, 34, 0.12), transparent 20%, transparent 78%, rgba(54, 44, 34, 0.1)),
+    radial-gradient(ellipse at center, transparent 54%, rgba(60, 48, 36, 0.1) 130%);
 }
 
 /* ── Section Dividers ── */
