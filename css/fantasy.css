@@ -767,8 +767,9 @@ a:focus-visible, button:focus-visible, input:focus-visible {
   top: auto;
   z-index: 0;
   width: 100%;
-  height: min(92vh, 920px);
-  min-height: 620px;
+  height: 100vh;
+  height: 100svh;
+  min-height: 0;
   display: block;
   overflow: hidden;
   color: var(--ink);
@@ -1311,7 +1312,6 @@ a:focus-visible, button:focus-visible, input:focus-visible {
   .mobile-nav { align-items: stretch; gap: 0; }
   .mobile-nav-link { padding: 1rem 0; color: var(--ink); border-color: var(--line); font-family: var(--font-display); font-size: clamp(2.2rem, 10vw, 4rem); font-weight: 300; letter-spacing: -.05em; text-align: left; }
 
-  .hero-section { height: 82vh; min-height: 560px; }
   .hero-grid { padding-top: 7.5rem; grid-template-columns: repeat(6, 1fr); }
   .hero-eyebrow { grid-column: 1 / 5; }
   .hero-title-main { grid-column: 1 / 7; font-size: clamp(5rem, 24vw, 11rem); }
