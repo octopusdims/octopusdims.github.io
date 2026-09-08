@@ -47,7 +47,7 @@
   window.addEventListener('scroll', updateChrome, { passive: true });
 
   /* A short, single reveal: content is readable without JavaScript. */
-  const revealItems = document.querySelectorAll('.reveal-on-scroll');
+  const revealItems = document.querySelectorAll('.reveal-on-scroll, [data-reveal-once]');
   if (!reducedMotion.matches && 'IntersectionObserver' in window) {
     document.documentElement.classList.add('has-reveal-motion');
     const revealObserver = new IntersectionObserver((entries, observer) => {
@@ -60,6 +60,51 @@
     revealItems.forEach(item => revealObserver.observe(item));
   } else {
     revealItems.forEach(item => item.classList.add('is-visible'));
+  }
+
+  /* Featured video covers only decode while they are actually visible. */
+  const featuredVideos = [...document.querySelectorAll('.featured-media-video')];
+  function syncFeaturedVideo(video) {
+    const frame = video.closest('.featured-media');
+    const shouldPlay = video.dataset.mediaVisible === 'true' && !document.hidden && !reducedMotion.matches;
+    if (!shouldPlay) {
+      video.pause();
+      frame?.classList.remove('is-playing');
+      return;
+    }
+    video.play()
+      .then(() => frame?.classList.add('is-playing'))
+      .catch(() => frame?.classList.remove('is-playing'));
+  }
+  featuredVideos.forEach(video => {
+    video.muted = true;
+    const showMediaError = () => {
+      const frame = video.closest('.featured-media');
+      frame?.classList.remove('is-playing');
+      frame?.classList.add('is-media-error');
+    };
+    video.addEventListener('error', showMediaError);
+    video.querySelectorAll('source').forEach(source => source.addEventListener('error', showMediaError));
+    video.addEventListener('canplay', () => syncFeaturedVideo(video), { once: true });
+  });
+  if (featuredVideos.length && 'IntersectionObserver' in window) {
+    const videoObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        entry.target.dataset.mediaVisible = String(entry.isIntersecting);
+        syncFeaturedVideo(entry.target);
+      });
+    }, { rootMargin: '120px 0px', threshold: 0.08 });
+    featuredVideos.forEach(video => videoObserver.observe(video));
+  } else {
+    featuredVideos.forEach(video => {
+      video.dataset.mediaVisible = 'true';
+      syncFeaturedVideo(video);
+    });
+  }
+  if (featuredVideos.length) {
+    const syncAllFeaturedVideos = () => featuredVideos.forEach(syncFeaturedVideo);
+    document.addEventListener('visibilitychange', syncAllFeaturedVideos);
+    reducedMotion.addEventListener?.('change', syncAllFeaturedVideos);
   }
 
   /* Mobile navigation */
@@ -86,6 +131,7 @@
   const searchToggle = document.getElementById('searchToggle');
   let searchData = null;
   let searchOverlay = null;
+  let searchLastFocus = null;
 
   function escapeHtml(value) {
     const span = document.createElement('span');
@@ -108,7 +154,7 @@
   function renderSearch(query, resultsNode) {
     const q = query.trim().toLowerCase();
     if (!q) {
-      resultsNode.innerHTML = '<p class="search-empty">Enter a title, tag or phrase.</p>';
+      resultsNode.innerHTML = '<p class="search-empty">Start typing to search the archive.</p>';
       return;
     }
     const matches = (searchData || []).filter(item =>
@@ -124,27 +170,31 @@
   }
 
   function closeSearch() {
-    if (!searchOverlay) return;
+    if (!searchOverlay?.classList.contains('active')) return;
     searchOverlay.classList.remove('active');
+    searchOverlay.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('search-open');
-    searchToggle?.focus();
+    const focusTarget = searchLastFocus?.isConnected ? searchLastFocus : searchToggle;
+    requestAnimationFrame(() => focusTarget?.focus({ preventScroll: true }));
   }
 
   async function openSearch() {
+    searchLastFocus = document.activeElement instanceof HTMLElement ? document.activeElement : searchToggle;
     if (!searchOverlay) {
       searchOverlay = document.createElement('div');
       searchOverlay.className = 'search-overlay';
       searchOverlay.setAttribute('role', 'dialog');
       searchOverlay.setAttribute('aria-modal', 'true');
       searchOverlay.setAttribute('aria-label', 'Search archive');
+      searchOverlay.setAttribute('aria-hidden', 'true');
       searchOverlay.innerHTML = `
         <div class="search-panel">
           <div class="search-input-wrap">
             <label for="archiveSearch">Search archive</label>
             <button class="search-close" type="button" aria-label="Close search">Close</button>
-            <input id="archiveSearch" type="search" class="search-input" placeholder="Type to search…" autocomplete="off">
+            <input id="archiveSearch" type="search" class="search-input" placeholder="Title, tag or phrase…" autocomplete="off">
           </div>
-          <div class="search-results" aria-live="polite"><p class="search-empty">Enter a title, tag or phrase.</p></div>
+          <div class="search-results" aria-live="polite"><p class="search-empty">Start typing to search the archive.</p></div>
         </div>`;
       document.body.appendChild(searchOverlay);
       const input = searchOverlay.querySelector('.search-input');
@@ -160,13 +210,35 @@
       });
     }
     searchOverlay.classList.add('active');
+    searchOverlay.setAttribute('aria-hidden', 'false');
     document.body.classList.add('search-open');
-    await loadSearchData();
-    searchOverlay.querySelector('input').focus();
+    const input = searchOverlay.querySelector('.search-input');
+    const results = searchOverlay.querySelector('.search-results');
+    const dataReady = loadSearchData();
+    requestAnimationFrame(() => input.focus({ preventScroll: true }));
+    await dataReady;
+    renderSearch(input.value, results);
   }
   searchToggle?.addEventListener('click', openSearch);
   document.addEventListener('keydown', event => {
-    if (event.key === 'Escape' && searchOverlay?.classList.contains('active')) closeSearch();
+    if (!searchOverlay?.classList.contains('active')) return;
+    if (event.key === 'Escape') {
+      closeSearch();
+      return;
+    }
+    if (event.key !== 'Tab') return;
+    const focusable = [...searchOverlay.querySelectorAll('a[href], button:not([disabled]), input:not([disabled])')]
+      .filter(element => element.offsetParent !== null);
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable.at(-1);
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
   });
 
   /* Native heading observer for the table of contents. */

@@ -1,32 +1,17 @@
 /* DIMS — Star Nest / Golden Ether ambient stage */
 (function () {
   'use strict';
-  const container = document.getElementById('heroCanvasContainer');
-  const scope = document.getElementById('shaderScope') || document.getElementById('heroSection');
-  if (!container || !scope) return;
+  const primaryContainer = document.getElementById('heroCanvasContainer');
+  const primaryScope = document.getElementById('shaderScope') || document.getElementById('heroSection');
 
   const requested = new URLSearchParams(location.search).get('shader');
   const storedMode = Number(document.documentElement.dataset.heroShaderMode);
   const mode = requested === '0' || requested === '1' ? Number(requested) : (storedMode === 1 ? 1 : 0);
   const modeName = mode === 0 ? 'star-nest' : 'golden-ether';
   document.documentElement.dataset.heroShaderMode = String(mode);
-  scope.dataset.shaderMode = String(mode);
-  scope.dataset.shaderName = modeName;
-
-  const canvas = document.createElement('canvas');
-  canvas.className = 'hero-shader-canvas';
-  container.appendChild(canvas);
-  const gl = canvas.getContext('webgl2', {
-    alpha: false,
-    antialias: false,
-    depth: false,
-    powerPreference: 'high-performance',
-    preserveDrawingBuffer: false
-  });
-  if (!gl) {
-    scope.classList.add('shader-unavailable');
-    canvas.remove();
-    return;
+  if (primaryScope) {
+    primaryScope.dataset.shaderMode = String(mode);
+    primaryScope.dataset.shaderName = modeName;
   }
 
   const vertexSource = `#version 300 es
@@ -41,6 +26,7 @@
   uniform float uTime;
   uniform float uGrain;
   uniform int uMode;
+  uniform int uScene;
 
   float hash21(vec2 p) {
     p = fract(p * vec2(123.34, 456.21));
@@ -131,10 +117,47 @@
     return color;
   }
 
+  vec2 missingCoordinateWarp(vec2 p, float time) {
+    float row = floor((p.y + 2.4) * 9.0);
+    float rowPhase = hash21(vec2(row, 17.0));
+    float rowDrift = 0.5 + 0.5 * sin(time * 0.16 + rowPhase * 6.2831853);
+    p.x += (rowPhase - 0.5) * 0.09 * smoothstep(0.86, 0.98, rowDrift);
+
+    float column = floor((p.x + 3.0) * 5.0);
+    float columnPhase = hash21(vec2(column, 41.0));
+    p.y += (columnPhase - 0.5) * 0.025 * sin(time * 0.08 + columnPhase * 4.0);
+    return p;
+  }
+
+  vec3 missingCoordinateField(vec3 color, vec2 p, float time) {
+    vec2 voidPosition = p - vec2(0.62, -0.02);
+    float voidDistance = length(voidPosition / vec2(0.65, 0.50)) - 1.0;
+    float voidMask = 1.0 - smoothstep(-0.10, 0.28, voidDistance);
+    float voidEdge = 1.0 - smoothstep(0.0, 0.025, abs(voidDistance));
+
+    vec2 cellPosition = (p + vec2(2.8, 2.2)) * vec2(3.5, 6.0);
+    vec2 cellId = floor(cellPosition);
+    vec2 cellUv = fract(cellPosition) - 0.5;
+    float cellInterior = 1.0 - smoothstep(0.38, 0.49, max(abs(cellUv.x), abs(cellUv.y)));
+    float missingCell = step(0.92, hash21(cellId + vec2(13.0, 7.0))) * cellInterior * (1.0 - voidMask);
+
+    float scan = pow(0.5 + 0.5 * sin((p.y + time * 0.012) * 115.0), 18.0);
+    vec3 voidColor = uMode == 0 ? vec3(0.012, 0.014, 0.022) : vec3(0.80, 0.75, 0.64);
+    vec3 coordinateColor = uMode == 0 ? vec3(0.80, 0.68, 0.47) : vec3(0.26, 0.19, 0.12);
+
+    color = mix(color, voidColor, voidMask * 0.72);
+    color *= 1.0 - missingCell * 0.24;
+    color += coordinateColor * scan * (0.015 + 0.025 * (1.0 - voidMask));
+    color = mix(color, coordinateColor, voidEdge * 0.14);
+    return color;
+  }
+
   void main() {
     vec2 uv01 = gl_FragCoord.xy / uResolution.xy;
     vec2 p = aspectUv(uv01);
-    vec3 color = uMode == 0 ? starNest(p * 0.5, uTime) : goldenEther(p * 1.1, uTime);
+    vec2 samplePoint = uScene == 1 ? missingCoordinateWarp(p, uTime) : p;
+    vec3 color = uMode == 0 ? starNest(samplePoint * 0.5, uTime) : goldenEther(samplePoint * 1.1, uTime);
+    if (uScene == 1) color = missingCoordinateField(color, p, uTime);
     color = max(color, vec3(0.0));
     float grain = hash21(gl_FragCoord.xy + fract(uTime) * 173.0) - 0.5;
     color += grain * uGrain * 0.05;
@@ -145,7 +168,47 @@
     fragColor = vec4(color, 1.0);
   }`;
 
-  function compile(type, source) {
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const ambientMirrors = [...document.querySelectorAll('.featured-shader-stage.is-ambient-window')].map(container => {
+    const canvas = document.createElement('canvas');
+    canvas.className = 'featured-shader-canvas ambient-shader-mirror';
+    container.appendChild(canvas);
+    return { container, canvas, context: canvas.getContext('2d', { alpha: false }) };
+  }).filter(mirror => mirror.context);
+  let lastAmbientFrame = 0;
+
+  function paintAmbientMirrors(source, now) {
+    if (!ambientMirrors.length) return;
+    if (!reducedMotion.matches && now - lastAmbientFrame < 42) return;
+    lastAmbientFrame = now;
+    ambientMirrors.forEach(({ container, canvas, context }) => {
+      const bounds = container.getBoundingClientRect();
+      if (bounds.bottom < -200 || bounds.top > window.innerHeight + 200) return;
+      const quality = Math.min(window.devicePixelRatio || 1, 1);
+      const width = Math.max(1, Math.floor(container.clientWidth * quality));
+      const height = Math.max(1, Math.floor(container.clientHeight * quality));
+      if (canvas.width !== width || canvas.height !== height) {
+        canvas.width = width;
+        canvas.height = height;
+      }
+      const sourceRatio = source.width / source.height;
+      const targetRatio = width / height;
+      let sourceX = 0;
+      let sourceY = 0;
+      let sourceWidth = source.width;
+      let sourceHeight = source.height;
+      if (sourceRatio > targetRatio) {
+        sourceWidth = source.height * targetRatio;
+        sourceX = (source.width - sourceWidth) * 0.5;
+      } else {
+        sourceHeight = source.width / targetRatio;
+        sourceY = (source.height - sourceHeight) * 0.5;
+      }
+      context.drawImage(source, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, width, height);
+    });
+  }
+
+  function compile(gl, type, source) {
     const shader = gl.createShader(type);
     gl.shaderSource(shader, source);
     gl.compileShader(shader);
@@ -153,77 +216,128 @@
     return shader;
   }
 
-  let program;
-  try {
-    program = gl.createProgram();
-    gl.attachShader(program, compile(gl.VERTEX_SHADER, vertexSource));
-    gl.attachShader(program, compile(gl.FRAGMENT_SHADER, fragmentSource));
-    gl.linkProgram(program);
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program));
-  } catch (_) {
-    canvas.remove();
-    scope.classList.add('shader-unavailable');
-    return;
-  }
+  function mountStage(container, visibilityTarget, canvasClass, failureTarget, mirrorSource) {
+    const canvas = document.createElement('canvas');
+    canvas.className = canvasClass;
+    container.appendChild(canvas);
+    const gl = canvas.getContext('webgl2', {
+      alpha: false,
+      antialias: false,
+      depth: false,
+      powerPreference: 'high-performance',
+      preserveDrawingBuffer: false
+    });
+    if (!gl) {
+      failureTarget.classList.add('shader-unavailable');
+      canvas.remove();
+      return null;
+    }
 
-  gl.useProgram(program);
-  const buffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
-  const position = gl.getAttribLocation(program, 'position');
-  gl.enableVertexAttribArray(position);
-  gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
-  const resolution = gl.getUniformLocation(program, 'uResolution');
-  const timeUniform = gl.getUniformLocation(program, 'uTime');
-  const modeUniform = gl.getUniformLocation(program, 'uMode');
-  const pointerUniform = gl.getUniformLocation(program, 'uPointer');
-  const grainUniform = gl.getUniformLocation(program, 'uGrain');
-  gl.uniform1i(modeUniform, mode);
-  gl.uniform2f(pointerUniform, 0.5, 0.5);
-  gl.uniform1f(grainUniform, mode === 0 ? 0.18 : 0.12);
+    let program;
+    try {
+      program = gl.createProgram();
+      gl.attachShader(program, compile(gl, gl.VERTEX_SHADER, vertexSource));
+      gl.attachShader(program, compile(gl, gl.FRAGMENT_SHADER, fragmentSource));
+      gl.linkProgram(program);
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program));
+    } catch (_) {
+      canvas.remove();
+      failureTarget.classList.add('shader-unavailable');
+      return null;
+    }
 
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  let visible = true;
-  let frame = 0;
-  const startedAt = performance.now();
+    gl.useProgram(program);
+    const buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
+    const position = gl.getAttribLocation(program, 'position');
+    gl.enableVertexAttribArray(position);
+    gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
+    const resolution = gl.getUniformLocation(program, 'uResolution');
+    const timeUniform = gl.getUniformLocation(program, 'uTime');
+    const modeUniform = gl.getUniformLocation(program, 'uMode');
+    const sceneUniform = gl.getUniformLocation(program, 'uScene');
+    const pointerUniform = gl.getUniformLocation(program, 'uPointer');
+    const grainUniform = gl.getUniformLocation(program, 'uGrain');
+    gl.uniform1i(modeUniform, mode);
+    gl.uniform1i(sceneUniform, visibilityTarget.dataset.shaderScene === 'missing-coordinates' ? 1 : 0);
+    gl.uniform2f(pointerUniform, 0.5, 0.5);
+    gl.uniform1f(grainUniform, mode === 0 ? 0.18 : 0.12);
 
-  function resize() {
-    const quality = Math.min(window.devicePixelRatio || 1, mode === 0 ? 1.12 : 1.3);
-    const width = Math.max(1, Math.floor(container.clientWidth * quality));
-    const height = Math.max(1, Math.floor(container.clientHeight * quality));
-    if (canvas.width === width && canvas.height === height) return;
-    canvas.width = width;
-    canvas.height = height;
-    gl.viewport(0, 0, width, height);
-  }
+    let visible = true;
+    let frame = 0;
+    const startedAt = performance.now();
 
-  function draw(now) {
-    resize();
-    gl.uniform2f(resolution, canvas.width, canvas.height);
-    gl.uniform1f(timeUniform, reducedMotion.matches ? 0 : (now - startedAt) / 1000);
-    gl.drawArrays(gl.TRIANGLES, 0, 3);
-  }
+    function resize() {
+      const qualityCap = canvasClass === 'hero-shader-canvas' ? (mode === 0 ? 1.12 : 1.3) : 1;
+      const quality = Math.min(window.devicePixelRatio || 1, qualityCap);
+      const width = Math.max(1, Math.floor(container.clientWidth * quality));
+      const height = Math.max(1, Math.floor(container.clientHeight * quality));
+      if (canvas.width === width && canvas.height === height) return;
+      canvas.width = width;
+      canvas.height = height;
+      gl.viewport(0, 0, width, height);
+    }
 
-  function loop(now) {
-    frame = 0;
-    draw(now);
-    if (visible && !document.hidden && !reducedMotion.matches) frame = requestAnimationFrame(loop);
-  }
+    function draw(now) {
+      resize();
+      gl.uniform2f(resolution, canvas.width, canvas.height);
+      gl.uniform1f(timeUniform, reducedMotion.matches ? 0 : (now - startedAt) / 1000);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+      if (mirrorSource) paintAmbientMirrors(canvas, now);
+    }
 
-  function updatePlayback() {
-    cancelAnimationFrame(frame);
-    frame = 0;
-    if (visible && !document.hidden && !reducedMotion.matches) frame = requestAnimationFrame(loop);
-    else draw(performance.now());
-  }
+    function loop(now) {
+      frame = 0;
+      draw(now);
+      if (visible && !document.hidden && !reducedMotion.matches) frame = requestAnimationFrame(loop);
+    }
 
-  new IntersectionObserver(entries => {
-    visible = entries[0].isIntersecting;
+    function updatePlayback() {
+      cancelAnimationFrame(frame);
+      frame = 0;
+      if (visible && !document.hidden && !reducedMotion.matches) frame = requestAnimationFrame(loop);
+      else draw(performance.now());
+    }
+
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(entries => {
+        visible = entries[0].isIntersecting;
+        updatePlayback();
+      }, { threshold: 0.01 }).observe(visibilityTarget);
+    }
+    document.addEventListener('visibilitychange', updatePlayback);
+    window.addEventListener('resize', () => draw(performance.now()), { passive: true });
+    reducedMotion.addEventListener?.('change', updatePlayback);
+    canvas.addEventListener('webglcontextlost', event => {
+      event.preventDefault();
+      failureTarget.classList.add('shader-unavailable');
+    });
+    draw(startedAt);
     updatePlayback();
-  }, { threshold: 0.01 }).observe(scope);
-  document.addEventListener('visibilitychange', updatePlayback);
-  window.addEventListener('resize', () => draw(performance.now()), { passive: true });
-  reducedMotion.addEventListener?.('change', updatePlayback);
-  draw(startedAt);
-  updatePlayback();
+    return { updatePlayback };
+  }
+
+  if (primaryContainer && primaryScope) {
+    mountStage(primaryContainer, primaryScope, 'hero-shader-canvas', primaryScope, true);
+  }
+
+  const previews = [...document.querySelectorAll('[data-featured-shader="local"]')];
+  const mountPreview = container => {
+    if (container.dataset.shaderMounted === 'true') return;
+    container.dataset.shaderMounted = 'true';
+    mountStage(container, container.closest('.featured-media') || container, 'featured-shader-canvas', container, false);
+  };
+  if ('IntersectionObserver' in window) {
+    const previewObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        mountPreview(entry.target);
+        observer.unobserve(entry.target);
+      });
+    }, { rootMargin: '240px 0px', threshold: 0.01 });
+    previews.forEach(preview => previewObserver.observe(preview));
+  } else {
+    previews.forEach(mountPreview);
+  }
 })();
